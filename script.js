@@ -2,7 +2,8 @@
 "use strict";
 
 /* =========================================
-   EDU VERSE — BANGLA 1ST PAPER LIBRARY v3
+   EDU VERSE — PREMIUM LEARNING SYSTEM
+   BANGLA 1ST PAPER + QUIZ SYSTEM
 ========================================= */
 
 const pageNames = [
@@ -23,8 +24,13 @@ let currentQuestion = 0;
 let currentScore = 0;
 let quizAnswered = false;
 
+let currentMode = "mcq";
+let quizTimer = null;
+let timeLeft = 60;
+let quizResultSaved = false;
+
 /* =========================================
-   STORAGE
+   STORAGE & HELPERS
 ========================================= */
 
 function readStorage(key, fallback) {
@@ -55,7 +61,7 @@ function escapeHTML(value) {
 }
 
 /* =========================================
-   GADYA CHAPTER DATA
+   BANGLA 1ST PAPER — GADYA
 ========================================= */
 
 const bangla1Gadya = [
@@ -92,7 +98,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "বিলাসী",
     author: "শরৎচন্দ্র চট্টোপাধ্যায়",
@@ -126,7 +131,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "আহ্বান",
     author: "বিভূতিভূষণ বন্দ্যোপাধ্যায়",
@@ -154,7 +158,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "মাসি-পিসি",
     author: "মানিক বন্দ্যোপাধ্যায়",
@@ -182,7 +185,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "একটি তুলসী গাছের কাহিনী",
     author: "সৈয়দ ওয়ালীউল্লাহ্",
@@ -210,7 +212,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "রেইনকোট",
     author: "আখতারুজ্জামান ইলিয়াস",
@@ -226,7 +227,7 @@ const bangla1Gadya = [
     mcq: [
       {
         question: "রেইনকোট গল্পের লেখক কে?",
-        options: ["আখতারুজ্জামান ইলিয়াস", "সৈয়দ শামসুল হক", "আবু ফজল", "আনিসুজ্জামান"],
+        options: ["আখতারুজ্জামান ইলিয়াস", "সৈয়দ শামসুল হক", "আবুল ফজল", "আনিসুজ্জামান"],
         answer: 0,
         explanation: "রেইনকোট গল্পের লেখক আখতারুজ্জামান ইলিয়াস।"
       }
@@ -238,7 +239,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "নেকলেস",
     author: "গী দ্য মোপাসাঁ",
@@ -266,7 +266,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "আত্মচরিত",
     author: "ঈশ্বরচন্দ্র বিদ্যাসাগর",
@@ -294,7 +293,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "বাঙ্গালার নব্য লেখকদিগের প্রতি নিবেদন",
     author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়",
@@ -322,7 +320,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "কারবালা-প্রান্তর",
     author: "মীর মশাররফ হোসেন",
@@ -350,7 +347,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "সাহিত্যে খেলা",
     author: "প্রমথ চৌধুরী",
@@ -378,7 +374,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "অর্ধাঙ্গী",
     author: "রোকেয়া সাখাওয়াত হোসেন",
@@ -406,7 +401,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "শিক্ষাচিন্তা",
     author: "কাজী আবদুল ওদুদ",
@@ -434,7 +428,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "ভুলের মূল্য",
     author: "কাজী মোতাহার হোসেন",
@@ -462,7 +455,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "যৌবনের গান",
     author: "কাজী নজরুল ইসলাম",
@@ -490,7 +482,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "জীবন ও বৃক্ষ",
     author: "মোতাহার হোসেন চৌধুরী",
@@ -518,7 +509,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "মানব-কল্যাণ",
     author: "আবুল ফজল",
@@ -546,7 +536,6 @@ const bangla1Gadya = [
       }
     ]
   },
-
   {
     title: "জাদুঘরে কেন যাব",
     author: "আনিসুজ্জামান",
@@ -577,7 +566,7 @@ const bangla1Gadya = [
 ];
 
 /* =========================================
-   KOBITA LIST
+   BANGLA 1ST PAPER — KOBITA
 ========================================= */
 
 const bangla1Kobita = [
@@ -777,7 +766,6 @@ function openChapterDetails(chapter, section) {
   const isSaved = saved.some(item => item.title === chapter.title);
   const isCompleted = completed.includes(chapter.title);
   const writer = section === "গদ্য" ? "লেখক" : "কবি";
-
   const hasNotes = Boolean(chapter.intro);
 
   page.innerHTML = `
@@ -830,7 +818,7 @@ function openChapterDetails(chapter, section) {
 
         <div class="detail-topic">
           <h3>📝 অধ্যায়ভিত্তিক MCQ</h3>
-          <p>এই অধ্যায়ের অনুশীলনী প্রশ্নগুলো দিয়ে পরীক্ষা দাও।</p>
+          <p>এই অধ্যায়ের প্রশ্ন দিয়ে অনুশীলন করো।</p>
           <button class="primary-btn" onclick="startChapterPractice()">
             Start Chapter MCQ →
           </button>
@@ -854,6 +842,10 @@ function openChapterDetails(chapter, section) {
         <div class="detail-topic">
           <h3>📖 পাঠ পরিচিতি</h3>
           <p>এই অধ্যায়ের বিস্তারিত নোট পরবর্তী আপডেটে যোগ করা হবে।</p>
+        </div>
+        <div class="detail-topic">
+          <h3>📝 অধ্যায়ভিত্তিক MCQ</h3>
+          <p>এই কবিতার MCQ ও ব্যাখ্যা পরবর্তী আপডেটে যোগ করা হবে।</p>
         </div>
       `}
 
@@ -946,10 +938,12 @@ function renderSaved() {
 
     remove.addEventListener("click", event => {
       event.stopPropagation();
+
       writeStorage(
         STORAGE.saved,
         readStorage(STORAGE.saved, []).filter(item => item.title !== chapter.title)
       );
+
       renderSaved();
       updateProgress();
     });
@@ -961,7 +955,118 @@ function renderSaved() {
 }
 
 /* =========================================
-   CHAPTER MCQ
+   GENERAL QUESTION BANK 1 — MCQ
+========================================= */
+
+const practiceQuestions = [
+  {
+    question: "বাংলা সাহিত্যের প্রথম সার্থক উপন্যাস কোনটি?",
+    options: ["দুর্গেশনন্দিনী", "কপালকুণ্ডলা", "বিষবৃক্ষ", "কৃষ্ণকান্তের উইল"],
+    answer: 0,
+    explanation: "দুর্গেশনন্দিনী বাংলা সাহিত্যের প্রথম সার্থক উপন্যাস হিসেবে পরিচিত।"
+  },
+  {
+    question: "বাংলা সাহিত্যের চলিত রীতির প্রতিষ্ঠায় কার অবদান বিশেষভাবে উল্লেখযোগ্য?",
+    options: ["প্রমথ চৌধুরী", "বঙ্কিমচন্দ্র", "বিদ্যাসাগর", "মাইকেল মধুসূদন"],
+    answer: 0,
+    explanation: "প্রমথ চৌধুরী বাংলা গদ্যে চলিত রীতির প্রতিষ্ঠায় গুরুত্বপূর্ণ ভূমিকা রাখেন।"
+  },
+  {
+    question: "বাংলাদেশের জাতীয় কবি কে?",
+    options: ["রবীন্দ্রনাথ ঠাকুর", "কাজী নজরুল ইসলাম", "জসীমউদ্দীন", "সুকান্ত ভট্টাচার্য"],
+    answer: 1,
+    explanation: "কাজী নজরুল ইসলাম বাংলাদেশের জাতীয় কবি।"
+  },
+  {
+    question: "গীতাঞ্জলি কাব্যগ্রন্থের রচয়িতা কে?",
+    options: ["জীবনানন্দ দাশ", "রবীন্দ্রনাথ ঠাকুর", "কাজী নজরুল ইসলাম", "সুফিয়া কামাল"],
+    answer: 1,
+    explanation: "গীতাঞ্জলি রবীন্দ্রনাথ ঠাকুরের বিখ্যাত কাব্যগ্রন্থ।"
+  },
+  {
+    question: "পল্লীকবি বলা হয় কাকে?",
+    options: ["জসীমউদ্দীন", "আল মাহমুদ", "ফররুখ আহমদ", "শামসুর রাহমান"],
+    answer: 0,
+    explanation: "জসীমউদ্দীন পল্লীকবি নামে পরিচিত।"
+  }
+];
+
+/* =========================================
+   GENERAL QUESTION BANK 2 — TIMER
+========================================= */
+
+const timedQuestions = [
+  {
+    question: "রবীন্দ্রনাথ ঠাকুর কত সালে নোবেল পুরস্কার পান?",
+    options: ["১৯০৫", "১৯১১", "১৯১৩", "১৯২১"],
+    answer: 2,
+    explanation: "তিনি ১৯১৩ সালে সাহিত্যে নোবেল পুরস্কার লাভ করেন।"
+  },
+  {
+    question: "বিলাসী গল্পের লেখক কে?",
+    options: ["শরৎচন্দ্র", "রবীন্দ্রনাথ", "মানিক বন্দ্যোপাধ্যায়", "বিভূতিভূষণ"],
+    answer: 0,
+    explanation: "বিলাসী গল্পের লেখক শরৎচন্দ্র চট্টোপাধ্যায়।"
+  },
+  {
+    question: "বিদ্রোহী কবিতার রচয়িতা কে?",
+    options: ["সুকান্ত", "নজরুল", "জসীমউদ্দীন", "জীবনানন্দ"],
+    answer: 1,
+    explanation: "বিদ্রোহী কবিতার রচয়িতা কাজী নজরুল ইসলাম।"
+  },
+  {
+    question: "নকশী কাঁথার মাঠ কার রচনা?",
+    options: ["রবীন্দ্রনাথ", "জসীমউদ্দীন", "আল মাহমুদ", "ফররুখ আহমদ"],
+    answer: 1,
+    explanation: "নকশী কাঁথার মাঠ জসীমউদ্দীনের বিখ্যাত কাব্য।"
+  },
+  {
+    question: "আত্মচরিত রচনার লেখক কে?",
+    options: ["বিদ্যাসাগর", "বঙ্কিমচন্দ্র", "প্রমথ চৌধুরী", "আবুল ফজল"],
+    answer: 0,
+    explanation: "আত্মচরিত ঈশ্বরচন্দ্র বিদ্যাসাগরের আত্মজীবনীমূলক রচনা।"
+  }
+];
+
+/* =========================================
+   GENERAL QUESTION BANK 3 — QUICK QUIZ
+========================================= */
+
+const quickQuestions = [
+  {
+    question: "অপরিচিতা গল্পের লেখক কে?",
+    options: ["রবীন্দ্রনাথ ঠাকুর", "শরৎচন্দ্র", "মানিক বন্দ্যোপাধ্যায়", "বিভূতিভূষণ"],
+    answer: 0,
+    explanation: "অপরিচিতা গল্পের লেখক রবীন্দ্রনাথ ঠাকুর।"
+  },
+  {
+    question: "নেকলেস গল্পের মূল লেখক কে?",
+    options: ["ভিক্টর হুগো", "গী দ্য মোপাসাঁ", "আলবেয়ার কামু", "শরৎচন্দ্র"],
+    answer: 1,
+    explanation: "নেকলেস গল্পের মূল লেখক গী দ্য মোপাসাঁ।"
+  },
+  {
+    question: "সোনার তরী কার রচনা?",
+    options: ["কাজী নজরুল", "রবীন্দ্রনাথ", "জীবনানন্দ", "সুকান্ত"],
+    answer: 1,
+    explanation: "সোনার তরী রবীন্দ্রনাথ ঠাকুরের কবিতা।"
+  },
+  {
+    question: "মাসি-পিসি গল্পের লেখক কে?",
+    options: ["মানিক বন্দ্যোপাধ্যায়", "শরৎচন্দ্র", "আবুল ফজল", "আনিসুজ্জামান"],
+    answer: 0,
+    explanation: "মাসি-পিসি গল্পের লেখক মানিক বন্দ্যোপাধ্যায়।"
+  },
+  {
+    question: "সাম্যবাদী কবিতার কবি কে?",
+    options: ["জীবনানন্দ দাশ", "কাজী নজরুল ইসলাম", "জসীমউদ্দীন", "সুফিয়া কামাল"],
+    answer: 1,
+    explanation: "সাম্যবাদী কবিতার কবি কাজী নজরুল ইসলাম।"
+  }
+];
+
+/* =========================================
+   CHAPTER PRACTICE
 ========================================= */
 
 function startChapterPractice() {
@@ -970,46 +1075,65 @@ function startChapterPractice() {
     return;
   }
 
+  currentMode = "chapter";
   currentPractice = currentChapter.mcq.map(q => ({...q}));
-  currentQuestion = 0;
-  currentScore = 0;
-  quizAnswered = false;
-
-  showQuizPage();
+  startQuiz();
 }
 
-const sampleQuestions = [
-  {
-    question: "বাংলা সাহিত্যের প্রথম সার্থক উপন্যাস কোনটি?",
-    options: ["দুর্গেশনন্দিনী", "কপালকুণ্ডলা", "আলালের ঘরের দুলাল", "বিষবৃক্ষ"],
-    answer: 0,
-    explanation: "দুর্গেশনন্দিনী বাংলা সাহিত্যের প্রথম সার্থক উপন্যাস হিসেবে পরিচিত।"
-  },
-  {
-    question: "রবীন্দ্রনাথ ঠাকুর কোন সালে নোবেল পুরস্কার পান?",
-    options: ["১৯০৫", "১৯১১", "১৯১৩", "১৯২১"],
-    answer: 2,
-    explanation: "রবীন্দ্রনাথ ঠাকুর ১৯১৩ সালে সাহিত্যে নোবেল পুরস্কার পান।"
-  },
-  {
-    question: "কাজী নজরুল ইসলাম কী নামে পরিচিত?",
-    options: ["বিশ্বকবি", "বিদ্রোহী কবি", "পল্লীকবি", "স্বভাবকবি"],
-    answer: 1,
-    explanation: "কাজী নজরুল ইসলাম বিদ্রোহী কবি হিসেবে পরিচিত।"
-  }
-];
-
 /* =========================================
-   GENERAL PRACTICE
+   START GENERAL QUIZ
 ========================================= */
 
 function startPractice(mode = "mcq") {
-  currentPractice = [...sampleQuestions];
+  currentMode = mode;
+
+  if (mode === "timer") {
+    currentPractice = [...timedQuestions];
+  } else if (mode === "quick") {
+    currentPractice = [...quickQuestions];
+  } else {
+    currentPractice = [...practiceQuestions];
+  }
+
+  startQuiz();
+}
+
+/* =========================================
+   QUIZ INITIALIZATION
+========================================= */
+
+function startQuiz() {
+  clearInterval(quizTimer);
+
   currentQuestion = 0;
   currentScore = 0;
   quizAnswered = false;
+  quizResultSaved = false;
+  timeLeft = 60;
+
   showQuizPage();
+
+  if (currentMode === "timer") {
+    quizTimer = setInterval(() => {
+      timeLeft--;
+
+      const timer = document.getElementById("quizTimer");
+
+      if (timer) {
+        timer.textContent = "⏱ সময় বাকি: " + timeLeft + " সেকেন্ড";
+      }
+
+      if (timeLeft <= 0) {
+        clearInterval(quizTimer);
+        showQuizResult(true);
+      }
+    }, 1000);
+  }
 }
+
+/* =========================================
+   QUIZ PAGE
+========================================= */
 
 function showQuizPage() {
   let page = document.getElementById("quizPage");
@@ -1024,12 +1148,13 @@ function showQuizPage() {
   hideAllPages();
   page.classList.add("active");
   setActiveNav("practice");
+
   renderQuestion();
   scrollTop();
 }
 
 /* =========================================
-   QUIZ RENDER
+   RENDER QUESTION
 ========================================= */
 
 function renderQuestion() {
@@ -1042,15 +1167,29 @@ function renderQuestion() {
   }
 
   quizAnswered = false;
+
   const q = currentPractice[currentQuestion];
+
+  const modeTitle = {
+    mcq: "MCQ PRACTICE",
+    timer: "TIMER QUIZ",
+    quick: "QUICK QUIZ",
+    chapter: "CHAPTER PRACTICE"
+  };
 
   page.innerHTML = `
     <div class="container">
-      <button class="back" onclick="closeQuiz()">← Practice</button>
+      <button class="back" onclick="closeQuiz()">← ফিরে যাও</button>
 
       <div class="quiz-card">
+        <p class="muted">${modeTitle[currentMode] || "QUIZ"}</p>
+
+        ${currentMode === "timer"
+          ? `<h3 id="quizTimer">⏱ সময় বাকি: ${timeLeft} সেকেন্ড</h3>`
+          : ""}
+
         <p class="muted">
-          QUESTION ${currentQuestion + 1} / ${currentPractice.length}
+          প্রশ্ন ${currentQuestion + 1} / ${currentPractice.length}
         </p>
 
         <h2>${escapeHTML(q.question)}</h2>
@@ -1058,8 +1197,10 @@ function renderQuestion() {
         <div id="quizOptions"></div>
         <div id="quizFeedback"></div>
 
-        <button id="nextQuestion" class="primary-btn"
-          style="display:none" onclick="nextQuestion()">
+        <button id="nextQuestion"
+          class="primary-btn"
+          style="display:none"
+          onclick="nextQuestion()">
           পরের প্রশ্ন →
         </button>
       </div>
@@ -1070,12 +1211,19 @@ function renderQuestion() {
 
   q.options.forEach((option, index) => {
     const button = document.createElement("button");
+
     button.className = "quiz-option";
-    button.textContent = String.fromCharCode(65 + index) + ". " + option;
+    button.textContent =
+      String.fromCharCode(65 + index) + ". " + option;
+
     button.addEventListener("click", () => checkAnswer(index));
     options.appendChild(button);
   });
 }
+
+/* =========================================
+   CHECK ANSWER
+========================================= */
 
 function checkAnswer(selected) {
   if (quizAnswered) return;
@@ -1088,13 +1236,17 @@ function checkAnswer(selected) {
   document.querySelectorAll(".quiz-option").forEach((button, index) => {
     button.disabled = true;
 
-    if (index === q.answer) button.classList.add("quiz-correct");
+    if (index === q.answer) {
+      button.classList.add("quiz-correct");
+    }
+
     if (index === selected && selected !== q.answer) {
       button.classList.add("quiz-wrong");
     }
   });
 
   const correct = selected === q.answer;
+
   if (correct) currentScore++;
 
   const feedback = document.getElementById("quizFeedback");
@@ -1102,53 +1254,82 @@ function checkAnswer(selected) {
   if (feedback) {
     feedback.textContent =
       (correct ? "সঠিক উত্তর! " : "ভুল উত্তর। ") +
-      (q.explanation || "ব্যাখ্যা যুক্ত করা হবে।");
+      (q.explanation || "ব্যাখ্যা এখনো যোগ করা হয়নি।");
+
     feedback.className = correct ? "quiz-correct" : "quiz-wrong";
   }
 
   const next = document.getElementById("nextQuestion");
-  if (next) next.style.display = "inline-block";
+
+  if (next) {
+    next.style.display = "inline-block";
+  }
 }
+
+/* =========================================
+   NEXT QUESTION
+========================================= */
 
 function nextQuestion() {
   if (!quizAnswered) return;
+
   currentQuestion++;
   renderQuestion();
 }
 
 /* =========================================
-   RESULT
+   QUIZ RESULT
 ========================================= */
 
-function showQuizResult() {
+function showQuizResult(timeUp = false) {
+  clearInterval(quizTimer);
+
+  if (quizResultSaved) return;
+  quizResultSaved = true;
+
   const page = document.getElementById("quizPage");
   if (!page) return;
 
   const total = currentPractice.length;
-  const percent = total ? Math.round(currentScore / total * 100) : 0;
 
-  writeStorage(STORAGE.quiz, Number(readStorage(STORAGE.quiz, 0)) + 1);
-  writeStorage(STORAGE.score, Number(readStorage(STORAGE.score, 0)) + currentScore);
+  const percent = total
+    ? Math.round((currentScore / total) * 100)
+    : 0;
+
+  writeStorage(
+    STORAGE.quiz,
+    Number(readStorage(STORAGE.quiz, 0)) + 1
+  );
+
+  writeStorage(
+    STORAGE.score,
+    Number(readStorage(STORAGE.score, 0)) + currentScore
+  );
 
   let message = "আরও অনুশীলন করো!";
 
-  if (percent === 100) message = "অসাধারণ! সব উত্তর সঠিক!";
-  else if (percent >= 60) message = "ভালো হয়েছে! আরও উন্নতি করো।";
+  if (percent === 100) {
+    message = "অসাধারণ! সব উত্তর সঠিক!";
+  } else if (percent >= 60) {
+    message = "ভালো হয়েছে! আরও উন্নতি করো।";
+  }
 
   page.innerHTML = `
     <div class="container">
       <div class="quiz-card">
-        <h2>🎉 Quiz Completed!</h2>
+        <h2>${timeUp ? "⏰ সময় শেষ!" : "🎉 Quiz Completed!"}</h2>
+
         <h1>${currentScore} / ${total}</h1>
+
         <p>তোমার ফলাফল: ${percent}%</p>
         <p class="muted">${message}</p>
 
-        <button class="primary-btn" onclick="startPractice('mcq')">
-          Try Again
+        <button class="primary-btn" onclick="retryQuiz()">
+          আবার চেষ্টা করো
         </button>
 
         <button class="back" onclick="closeQuiz()">
-          Back to Practice
+          ফিরে যাও
         </button>
       </div>
     </div>
@@ -1157,10 +1338,33 @@ function showQuizResult() {
   updateProgress();
 }
 
+/* =========================================
+   RETRY QUIZ
+========================================= */
+
+function retryQuiz() {
+  if (currentMode === "chapter") {
+    startChapterPractice();
+  } else {
+    startPractice(currentMode);
+  }
+}
+
+/* =========================================
+   CLOSE QUIZ
+========================================= */
+
 function closeQuiz() {
+  clearInterval(quizTimer);
+
   const page = document.getElementById("quizPage");
   if (page) page.classList.remove("active");
-  showPage("practice");
+
+  if (currentMode === "chapter" && currentChapter) {
+    openChapterDetails(currentChapter, currentChapter.section);
+  } else {
+    showPage("practice");
+  }
 }
 
 /* =========================================
