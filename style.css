@@ -1,7 +1,7 @@
 
 /* =====================================
    EDU VERSE — PREMIUM OFFLINE DESIGN
-   Theme: Emerald + Gold
+   Theme: Emerald + Gold + Aurora
 ===================================== */
 
 :root {
@@ -32,14 +32,60 @@ html {
 }
 
 body {
+  position: relative;
+  isolation: isolate;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top right, rgba(39,112,78,.16), transparent 35%),
-    var(--bg);
+  background: #071510;
   color: var(--text);
   font-family: Arial, "Noto Sans Bengali", sans-serif;
   line-height: 1.6;
   padding-bottom: 90px;
+}
+
+/* =====================================
+   ANIMATED AURORA BACKGROUND
+===================================== */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: -1;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse at 25% 30%,
+      rgba(0,220,145,.23),
+      transparent 35%
+    ),
+    radial-gradient(
+      ellipse at 75% 65%,
+      rgba(0,130,100,.26),
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 50% 50%,
+      rgba(230,189,101,.08),
+      transparent 45%
+    );
+
+  filter: blur(45px);
+  animation: auroraFlow 12s ease-in-out infinite alternate;
+}
+
+@keyframes auroraFlow {
+  0% {
+    transform: translate(-5%,-3%) rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: translate(5%,4%) rotate(12deg) scale(1.1);
+  }
+
+  100% {
+    transform: translate(-3%,6%) rotate(-10deg) scale(1.05);
+  }
 }
 
 button,
@@ -115,6 +161,7 @@ button {
     opacity: 0;
     transform: translateY(7px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -130,7 +177,11 @@ button {
   margin-bottom: 20px;
   border-radius: 23px;
   background:
-    linear-gradient(135deg, rgba(25,75,53,.96), rgba(10,37,26,.98));
+    linear-gradient(
+      135deg,
+      rgba(25,75,53,.96),
+      rgba(10,37,26,.98)
+    );
   border: 1px solid rgba(230,189,101,.18);
   box-shadow: var(--shadow);
 }
@@ -142,6 +193,19 @@ button {
   top: 8px;
   font-size: 95px;
   color: rgba(230,189,101,.08);
+  animation: starGlow 4s ease-in-out infinite;
+}
+
+@keyframes starGlow {
+  0%,100% {
+    opacity: .4;
+    transform: rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: rotate(15deg);
+  }
 }
 
 .welcome .tag {
@@ -176,18 +240,24 @@ button {
   z-index: 1;
   padding: 11px 19px;
   border-radius: 11px;
-  background: linear-gradient(135deg, var(--gold2), var(--gold));
+  background: linear-gradient(135deg,var(--gold2),var(--gold));
   color: #17251b;
   font-weight: 800;
   font-size: 13px;
   box-shadow: 0 5px 15px rgba(230,189,101,.15);
+  transition: .25s;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(230,189,101,.25);
 }
 
 /* STATS */
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3,1fr);
   gap: 10px;
   margin: 18px 0 23px;
 }
@@ -195,9 +265,10 @@ button {
 .stat {
   text-align: center;
   padding: 15px 7px;
-  background: var(--card);
+  background: rgba(16,39,30,.88);
   border: 1px solid var(--border);
   border-radius: 15px;
+  backdrop-filter: blur(10px);
 }
 
 .stat strong {
@@ -218,7 +289,7 @@ button {
 
 .quick {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3,1fr);
   gap: 10px;
   margin: 14px 0 25px;
 }
@@ -228,11 +299,11 @@ button {
   padding: 12px 5px;
   border-radius: 15px;
   color: var(--text);
-  background: var(--card);
+  background: rgba(16,39,30,.88);
   border: 1px solid var(--border);
   font-size: 12px;
   font-weight: 700;
-  transition: .2s;
+  transition: .25s;
 }
 
 .quick button:active,
@@ -244,6 +315,7 @@ button {
 .quick button:hover {
   border-color: rgba(230,189,101,.4);
   background: var(--card2);
+  transform: translateY(-3px);
 }
 
 /* SECTION TITLES */
@@ -268,7 +340,7 @@ button {
   margin: 7px 0 18px;
   outline: none;
   color: var(--text);
-  background: var(--card);
+  background: rgba(16,39,30,.92);
   border: 1px solid var(--border);
   border-radius: 13px;
   font-size: 14px;
@@ -291,8 +363,14 @@ button {
   margin-bottom: 13px;
   padding: 14px;
   border-radius: 16px;
-  background: var(--card);
+  background: rgba(16,39,30,.88);
   border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  transition: .25s;
+}
+
+.subject-group:hover {
+  border-color: rgba(230,189,101,.2);
 }
 
 .group-title,
@@ -326,6 +404,7 @@ button {
 
 .paper:hover {
   border-color: rgba(230,189,101,.35);
+  transform: translateX(3px);
 }
 
 .paper-name {
@@ -361,7 +440,7 @@ button {
   padding: 15px;
   margin: 9px 0;
   border-radius: 13px;
-  background: var(--card);
+  background: rgba(16,39,30,.9);
   border: 1px solid var(--border);
   color: var(--text);
   font-size: 14px;
@@ -379,8 +458,9 @@ button {
   padding: 17px;
   margin: 12px 0;
   border-radius: 15px;
-  background: var(--card);
+  background: rgba(16,39,30,.9);
   border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
 }
 
 .chapter-detail-card h2,
@@ -416,7 +496,7 @@ button {
   padding: 18px;
   margin: 13px 0;
   border-radius: 16px;
-  background: var(--card);
+  background: rgba(16,39,30,.92);
   border: 1px solid var(--border);
 }
 
@@ -435,6 +515,7 @@ button {
   color: var(--text);
   background: var(--card2);
   border: 1px solid var(--border);
+  transition: .2s;
 }
 
 .quiz-option:hover {
@@ -483,7 +564,7 @@ button {
   padding: 18px;
   margin: 13px 0;
   border-radius: 16px;
-  background: var(--card);
+  background: rgba(16,39,30,.9);
   border: 1px solid var(--border);
 }
 
@@ -538,6 +619,7 @@ button {
   font-size: 10px;
   font-weight: 600;
   border-radius: 10px;
+  transition: .2s;
 }
 
 .nav-item span {
@@ -615,42 +697,20 @@ footer {
     font-size: 9px;
   }
 }
-/* EDU VERSE - Animated Aurora Background */
 
-body {
-  background:
-    radial-gradient(
-      ellipse at 15% 20%,
-      rgba(0, 180, 120, 0.16),
-      transparent 45%
-    ),
-    radial-gradient(
-      ellipse at 85% 75%,
-      rgba(0, 120, 90, 0.20),
-      transparent 45%
-    ),
-    #071512;
-
-  background-size: 200% 200%;
-  animation: auroraMove 12s ease-in-out infinite alternate;
-}
-
-@keyframes auroraMove {
-  0% {
-    background-position: 0% 0%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 100%;
-  }
-}
+/* ACCESSIBILITY */
 
 @media (prefers-reduced-motion: reduce) {
-  body {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+
+  body::before {
     animation: none;
   }
 }
