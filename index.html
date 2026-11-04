@@ -20,9 +20,10 @@
       <small>YOUR PERSONAL LEARNING WORLD</small>
     </div>
   </div>
-  <div class="profile">👤</div>
+  <div class="profile" onclick="showPage('profile')">👤</div>
 </header>
 
+<!-- HOME PAGE -->
 <main id="homePage" class="page active">
 <div class="container">
 
@@ -78,38 +79,46 @@
   <div class="subject-group">
     <div class="group-title">বাংলা</div>
     <div class="paper-list">
+
       <div class="paper" data-name="বাংলা ১ম পত্র" onclick="openPaper('বাংলা ১ম পত্র')">
         <div><div class="paper-name">বাংলা ১ম পত্র</div><small>Bangla First Paper</small></div>
         <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="বাংলা ২য় পত্র" onclick="openPaper('বাংলা ২য় পত্র')">
         <div><div class="paper-name">বাংলা ২য় পত্র</div><small>Bangla Second Paper</small></div>
         <span class="arrow">›</span>
       </div>
+
     </div>
   </div>
 
   <div class="subject-group">
     <div class="group-title">ইংরেজি</div>
     <div class="paper-list">
+
       <div class="paper" data-name="ইংরেজি ১ম পত্র" onclick="openPaper('ইংরেজি ১ম পত্র')">
         <div><div class="paper-name">ইংরেজি ১ম পত্র</div><small>English First Paper</small></div>
         <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="ইংরেজি ২য় পত্র" onclick="openPaper('ইংরেজি ২য় পত্র')">
         <div><div class="paper-name">ইংরেজি ২য় পত্র</div><small>English Second Paper</small></div>
         <span class="arrow">›</span>
       </div>
+
     </div>
   </div>
 
   <div class="subject-group">
     <div class="group-title">সাধারণ ও আবশ্যিক বিষয়</div>
     <div class="paper-list">
+
       <div class="paper" data-name="তথ্য ও যোগাযোগ প্রযুক্তি ICT" onclick="openPaper('তথ্য ও যোগাযোগ প্রযুক্তি')">
         <div><div class="paper-name">তথ্য ও যোগাযোগ প্রযুক্তি</div><small>Information & Communication Technology</small></div>
         <span class="arrow">›</span>
       </div>
+
     </div>
   </div>
 
@@ -117,58 +126,89 @@
     <div class="group-title">মানবিক বিভাগের বিষয়সমূহ</div>
     <div class="paper-list">
 
-      <div class="paper" data-name="পৌরনীতি ১ম পত্র" onclick="openPaper('পৌরনীতি ও সুশাসন ১ম পত্র')">
-        <div><div class="paper-name">পৌরনীতি ও সুশাসন ১ম পত্র</div><small>Civics First Paper</small></div><span class="arrow">›</span>
+      <div class="paper" data-name="পৌরনীতি ও সুশাসন ১ম পত্র" onclick="openPaper('পৌরনীতি ও সুশাসন ১ম পত্র')">
+        <div><div class="paper-name">পৌরনীতি ও সুশাসন ১ম পত্র</div><small>Civics First Paper</small></div>
+        <span class="arrow">›</span>
       </div>
-      <div class="paper" data-name="পৌরনীতি ২য় পত্র" onclick="openPaper('পৌরনীতি ও সুশাসন ২য় পত্র')">
-        <div><div class="paper-name">পৌরনীতি ও সুশাসন ২য় পত্র</div><small>Civics Second Paper</small></div><span class="arrow">›</span>
+
+      <div class="paper" data-name="পৌরনীতি ও সুশাসন ২য় পত্র" onclick="openPaper('পৌরনীতি ও সুশাসন ২য় পত্র')">
+        <div><div class="paper-name">পৌরনীতি ও সুশাসন ২য় পত্র</div><small>Civics Second Paper</small></div>
+        <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="অর্থনীতি ১ম পত্র" onclick="openPaper('অর্থনীতি ১ম পত্র')">
-        <div><div class="paper-name">অর্থনীতি ১ম পত্র</div><small>Economics First Paper</small></div><span class="arrow">›</span>
+        <div><div class="paper-name">অর্থনীতি ১ম পত্র</div><small>Economics First Paper</small></div>
+        <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="অর্থনীতি ২য় পত্র" onclick="openPaper('অর্থনীতি ২য় পত্র')">
-        <div><div class="paper-name">অর্থনীতি ২য় পত্র</div><small>Economics Second Paper</small></div><span class="arrow">›</span>
+        <div><div class="paper-name">অর্থনীতি ২য় পত্র</div><small>Economics Second Paper</small></div>
+        <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="ইতিহাস ১ম পত্র" onclick="openPaper('ইতিহাস ১ম পত্র')">
-        <div><div class="paper-name">ইতিহাস ১ম পত্র</div><small>History First Paper</small></div><span class="arrow">›</span>
+        <div><div class="paper-name">ইতিহাস ১ম পত্র</div><small>History First Paper</small></div>
+        <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="ইতিহাস ২য় পত্র" onclick="openPaper('ইতিহাস ২য় পত্র')">
-        <div><div class="paper-name">ইতিহাস ২য় পত্র</div><small>History Second Paper</small></div><span class="arrow">›</span>
+        <div><div class="paper-name">ইতিহাস ২য় পত্র</div><small>History Second Paper</small></div>
+        <span class="arrow">›</span>
       </div>
-      <div class="paper" data-name="ইসলামের ইতিহাস ১ম পত্র" onclick="openPaper('ইসলামের ইতিহাস ও সংস্কৃতি ১ম পত্র')">
-        <div><div class="paper-name">ইসলামের ইতিহাস ও সংস্কৃতি ১ম পত্র</div><small>Islamic History First Paper</small></div><span class="arrow">›</span>
+
+      <div class="paper" data-name="ইসলামের ইতিহাস ও সংস্কৃতি ১ম পত্র" onclick="openPaper('ইসলামের ইতিহাস ও সংস্কৃতি ১ম পত্র')">
+        <div><div class="paper-name">ইসলামের ইতিহাস ও সংস্কৃতি ১ম পত্র</div><small>Islamic History First Paper</small></div>
+        <span class="arrow">›</span>
       </div>
-      <div class="paper" data-name="ইসলামের ইতিহাস ২য় পত্র" onclick="openPaper('ইসলামের ইতিহাস ও সংস্কৃতি ২য় পত্র')">
-        <div><div class="paper-name">ইসলামের ইতিহাস ও সংস্কৃতি ২য় পত্র</div><small>Islamic History Second Paper</small></div><span class="arrow">›</span>
+
+      <div class="paper" data-name="ইসলামের ইতিহাস ও সংস্কৃতি ২য় পত্র" onclick="openPaper('ইসলামের ইতিহাস ও সংস্কৃতি ২য় পত্র')">
+        <div><div class="paper-name">ইসলামের ইতিহাস ও সংস্কৃতি ২য় পত্র</div><small>Islamic History Second Paper</small></div>
+        <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="সমাজবিজ্ঞান ১ম পত্র" onclick="openPaper('সমাজবিজ্ঞান ১ম পত্র')">
-        <div><div class="paper-name">সমাজবিজ্ঞান ১ম পত্র</div><small>Sociology First Paper</small></div><span class="arrow">›</span>
+        <div><div class="paper-name">সমাজবিজ্ঞান ১ম পত্র</div><small>Sociology First Paper</small></div>
+        <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="সমাজবিজ্ঞান ২য় পত্র" onclick="openPaper('সমাজবিজ্ঞান ২য় পত্র')">
-        <div><div class="paper-name">সমাজবিজ্ঞান ২য় পত্র</div><small>Sociology Second Paper</small></div><span class="arrow">›</span>
+        <div><div class="paper-name">সমাজবিজ্ঞান ২য় পত্র</div><small>Sociology Second Paper</small></div>
+        <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="যুক্তিবিদ্যা ১ম পত্র" onclick="openPaper('যুক্তিবিদ্যা ১ম পত্র')">
-        <div><div class="paper-name">যুক্তিবিদ্যা ১ম পত্র</div><small>Logic First Paper</small></div><span class="arrow">›</span>
+        <div><div class="paper-name">যুক্তিবিদ্যা ১ম পত্র</div><small>Logic First Paper</small></div>
+        <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="যুক্তিবিদ্যা ২য় পত্র" onclick="openPaper('যুক্তিবিদ্যা ২য় পত্র')">
-        <div><div class="paper-name">যুক্তিবিদ্যা ২য় পত্র</div><small>Logic Second Paper</small></div><span class="arrow">›</span>
+        <div><div class="paper-name">যুক্তিবিদ্যা ২য় পত্র</div><small>Logic Second Paper</small></div>
+        <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="ভূগোল ১ম পত্র" onclick="openPaper('ভূগোল ১ম পত্র')">
-        <div><div class="paper-name">ভূগোল ১ম পত্র</div><small>Geography First Paper</small></div><span class="arrow">›</span>
+        <div><div class="paper-name">ভূগোল ১ম পত্র</div><small>Geography First Paper</small></div>
+        <span class="arrow">›</span>
       </div>
+
       <div class="paper" data-name="ভূগোল ২য় পত্র" onclick="openPaper('ভূগোল ২য় পত্র')">
-        <div><div class="paper-name">ভূগোল ২য় পত্র</div><small>Geography Second Paper</small></div><span class="arrow">›</span>
+        <div><div class="paper-name">ভূগোল ২য় পত্র</div><small>Geography Second Paper</small></div>
+        <span class="arrow">›</span>
       </div>
 
     </div>
   </div>
 </div>
 
-<div class="empty" id="empty">কোনো বিষয় পাওয়া যায়নি।</div>
+<div class="empty" id="empty" style="display:none">
+  কোনো বিষয় পাওয়া যায়নি।
+</div>
+
 <footer>EDU VERSE • LEARN WITHOUT LIMITS</footer>
 </div>
 </main>
 
+<!-- CHAPTER PAGE -->
 <section id="chapterPage" class="page">
   <div class="container">
     <button class="back" onclick="showPage('home')">← Back to Subjects</button>
@@ -178,6 +218,7 @@
   </div>
 </section>
 
+<!-- SUBJECTS PAGE -->
 <section id="subjectsPage" class="page">
   <div class="container">
     <div class="section-title"><h3>All Subjects</h3></div>
@@ -186,15 +227,29 @@
   </div>
 </section>
 
+<!-- PRACTICE PAGE -->
 <section id="practicePage" class="page">
   <div class="container">
     <div class="section-title"><h3>Practice Zone</h3></div>
-    <div class="paper"><div><div class="paper-name">📝 MCQ Practice</div><small>Practice your knowledge</small></div><span class="arrow">›</span></div>
-    <div class="paper" style="margin-top:10px"><div><div class="paper-name">⏱ Timed Quiz</div><small>Test yourself with a timer</small></div><span class="arrow">›</span></div>
-    <div class="paper" style="margin-top:10px"><div><div class="paper-name">🎯 Daily Quiz</div><small>Build your daily habit</small></div><span class="arrow">›</span></div>
+
+    <div class="paper">
+      <div><div class="paper-name">📝 MCQ Practice</div><small>Practice your knowledge</small></div>
+      <span class="arrow">›</span>
+    </div>
+
+    <div class="paper" style="margin-top:10px">
+      <div><div class="paper-name">⏱ Timed Quiz</div><small>Test yourself with a timer</small></div>
+      <span class="arrow">›</span>
+    </div>
+
+    <div class="paper" style="margin-top:10px">
+      <div><div class="paper-name">🎯 Daily Quiz</div><small>Build your daily habit</small></div>
+      <span class="arrow">›</span>
+    </div>
   </div>
 </section>
 
+<!-- SAVED PAGE -->
 <section id="savedPage" class="page">
   <div class="container">
     <div class="section-title"><h3>Saved Items</h3></div>
@@ -202,14 +257,22 @@
   </div>
 </section>
 
+<!-- PROFILE PAGE -->
 <section id="profilePage" class="page">
   <div class="container">
     <div class="section-title"><h3>My Progress</h3></div>
-    <div class="paper"><div><div class="paper-name">📊 Study Progress</div><small>Your learning journey</small></div></div>
-    <div class="paper" style="margin-top:10px"><div><div class="paper-name">⚙️ Settings</div><small>App preferences</small></div></div>
+
+    <div class="paper">
+      <div><div class="paper-name">📊 Study Progress</div><small>Your learning journey</small></div>
+    </div>
+
+    <div class="paper" style="margin-top:10px">
+      <div><div class="paper-name">⚙️ Settings</div><small>App preferences</small></div>
+    </div>
   </div>
 </section>
 
+<!-- BOTTOM NAVIGATION -->
 <nav class="bottom-nav">
   <button class="nav-item active" onclick="showPage('home',this)"><span>⌂</span>Home</button>
   <button class="nav-item" onclick="showPage('subjects',this)"><span>📚</span>Subjects</button>
@@ -218,68 +281,8 @@
   <button class="nav-item" onclick="showPage('profile',this)"><span>◉</span>Profile</button>
 </nav>
 
-<script>
-const pageNames = ['home','subjects','practice','saved','profile','chapter'];
-
-function showPage(name, button) {
-  pageNames.forEach(p => {
-    const el = document.getElementById(p + 'Page');
-    if (el) el.classList.remove('active');
-  });
-
-  const target = document.getElementById(name + 'Page');
-  if (target) target.classList.add('active');
-
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-  if (button) {
-    button.classList.add('active');
-  } else {
-    const index = ['home','subjects','practice','saved','profile'].indexOf(name);
-    const nav = document.querySelectorAll('.nav-item');
-    if (index >= 0) nav[index].classList.add('active');
-  }
-
-  window.scrollTo(0, 0);
-}
-
-function openPaper(name) {
-  document.getElementById('paperTitle').textContent = name;
-
-  const chapters = document.getElementById('chapterList');
-  chapters.innerHTML = '';
-
-  for (let i = 1; i <= 10; i++) {
-    const item = document.createElement('div');
-    item.className = 'chapter';
-    item.textContent = 'অধ্যায় ' + i + ' — ' + name;
-    chapters.appendChild(item);
-  }
-
-  showPage('chapter');
-}
-
-function filterSubjects() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  let visible = 0;
-
-  document.querySelectorAll('#subjectList .paper').forEach(item => {
-    const name = (item.dataset.name + ' ' + item.innerText).toLowerCase();
-    const match = name.includes(q);
-
-    item.style.display = match ? 'flex' : 'none';
-    if (match) visible++;
-  });
-
-  document.querySelectorAll('.subject-group').forEach(group => {
-    const items = group.querySelectorAll('.paper');
-    const hasMatch = [...items].some(item => item.style.display !== 'none');
-    group.style.display = hasMatch ? 'block' : 'none';
-  });
-
-  document.getElementById('empty').style.display = visible ? 'none' : 'block';
-}
-</script>
+<!-- EXTERNAL JAVASCRIPT -->
+<script src="script.js"></script>
 
 </body>
 </html>
