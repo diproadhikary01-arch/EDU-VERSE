@@ -615,3 +615,42 @@ footer {
     font-size: 9px;
   }
 }
+/* EDU VERSE - Animated Aurora Background */
+
+body {
+  background:
+    radial-gradient(
+      ellipse at 15% 20%,
+      rgba(0, 180, 120, 0.16),
+      transparent 45%
+    ),
+    radial-gradient(
+      ellipse at 85% 75%,
+      rgba(0, 120, 90, 0.20),
+      transparent 45%
+    ),
+    #071512;
+
+  background-size: 200% 200%;
+  animation: auroraMove 12s ease-in-out infinite alternate;
+}
+
+@keyframes auroraMove {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+  }
+}
