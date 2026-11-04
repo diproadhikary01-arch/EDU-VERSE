@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#071512">
   <meta name="description" content="EDU VERSE - Your Personal HSC Learning World">
   <meta name="color-scheme" content="dark">
+
   <title>EDU VERSE | Premium Learning</title>
 
   <link rel="stylesheet" href="./style.css">
@@ -52,8 +53,6 @@
 <main id="homePage" class="page active">
 
   <div class="container">
-
-    <!-- WELCOME -->
 
     <section class="welcome">
 
@@ -110,34 +109,22 @@
 
     <div class="quick">
 
-      <button
-        class="quick-item"
-        onclick="showPage('subjects')"
-      >
+      <button class="quick-item" onclick="showPage('subjects')">
         <span class="emoji">📚</span>
         <span>Subjects</span>
       </button>
 
-      <button
-        class="quick-item"
-        onclick="showPage('practice')"
-      >
+      <button class="quick-item" onclick="showPage('practice')">
         <span class="emoji">📝</span>
         <span>Practice</span>
       </button>
 
-      <button
-        class="quick-item"
-        onclick="showPage('saved')"
-      >
+      <button class="quick-item" onclick="showPage('saved')">
         <span class="emoji">🔖</span>
         <span>Saved Items</span>
       </button>
 
-      <button
-        class="quick-item"
-        onclick="showPage('profile')"
-      >
+      <button class="quick-item" onclick="showPage('profile')">
         <span class="emoji">📊</span>
         <span>My Progress</span>
       </button>
@@ -156,7 +143,6 @@
       id="searchInput"
       type="search"
       placeholder="🔍 Search subject or paper..."
-      oninput="filterSubjects()"
       autocomplete="off"
     >
 
@@ -177,11 +163,9 @@
 
         <div class="paper-list">
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="বাংলা ১ম পত্র"
-            onclick="openPaper('বাংলা ১ম পত্র')"
-          >
+            onclick="openPaper('বাংলা ১ম পত্র')">
             <div>
               <div class="paper-name">বাংলা ১ম পত্র</div>
               <small>Bangla First Paper</small>
@@ -189,11 +173,9 @@
             <span class="arrow">›</span>
           </div>
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="বাংলা ২য় পত্র"
-            onclick="openPaper('বাংলা ২য় পত্র')"
-          >
+            onclick="openPaper('বাংলা ২য় পত্র')">
             <div>
               <div class="paper-name">বাংলা ২য় পত্র</div>
               <small>Bangla Second Paper</small>
@@ -212,11 +194,9 @@
 
         <div class="paper-list">
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="ইংরেজি ১ম পত্র"
-            onclick="openPaper('ইংরেজি ১ম পত্র')"
-          >
+            onclick="openPaper('ইংরেজি ১ম পত্র')">
             <div>
               <div class="paper-name">ইংরেজি ১ম পত্র</div>
               <small>English First Paper</small>
@@ -224,11 +204,9 @@
             <span class="arrow">›</span>
           </div>
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="ইংরেজি ২য় পত্র"
-            onclick="openPaper('ইংরেজি ২য় পত্র')"
-          >
+            onclick="openPaper('ইংরেজি ২য় পত্র')">
             <div>
               <div class="paper-name">ইংরেজি ২য় পত্র</div>
               <small>English Second Paper</small>
@@ -247,11 +225,9 @@
 
         <div class="paper-list">
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="তথ্য ও যোগাযোগ প্রযুক্তি ICT"
-            onclick="openPaper('তথ্য ও যোগাযোগ প্রযুক্তি')"
-          >
+            onclick="openPaper('তথ্য ও যোগাযোগ প্রযুক্তি')">
             <div>
               <div class="paper-name">তথ্য ও যোগাযোগ প্রযুক্তি</div>
               <small>Information & Communication Technology</small>
@@ -270,11 +246,9 @@
 
         <div class="paper-list">
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="পৌরনীতি ও সুশাসন ১ম পত্র"
-            onclick="openPaper('পৌরনীতি ও সুশাসন ১ম পত্র')"
-          >
+            onclick="openPaper('পৌরনীতি ও সুশাসন ১ম পত্র')">
             <div>
               <div class="paper-name">পৌরনীতি ও সুশাসন ১ম পত্র</div>
               <small>Civics First Paper</small>
@@ -282,11 +256,9 @@
             <span class="arrow">›</span>
           </div>
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="পৌরনীতি ও সুশাসন ২য় পত্র"
-            onclick="openPaper('পৌরনীতি ও সুশাসন ২য় পত্র')"
-          >
+            onclick="openPaper('পৌরনীতি ও সুশাসন ২য় পত্র')">
             <div>
               <div class="paper-name">পৌরনীতি ও সুশাসন ২য় পত্র</div>
               <small>Civics Second Paper</small>
@@ -305,11 +277,9 @@
 
         <div class="paper-list">
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="অর্থনীতি ১ম পত্র"
-            onclick="openPaper('অর্থনীতি ১ম পত্র')"
-          >
+            onclick="openPaper('অর্থনীতি ১ম পত্র')">
             <div>
               <div class="paper-name">অর্থনীতি ১ম পত্র</div>
               <small>Economics First Paper</small>
@@ -317,11 +287,9 @@
             <span class="arrow">›</span>
           </div>
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="অর্থনীতি ২য় পত্র"
-            onclick="openPaper('অর্থনীতি ২য় পত্র')"
-          >
+            onclick="openPaper('অর্থনীতি ২য় পত্র')">
             <div>
               <div class="paper-name">অর্থনীতি ২য় পত্র</div>
               <small>Economics Second Paper</small>
@@ -340,11 +308,9 @@
 
         <div class="paper-list">
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="ইতিহাস ১ম পত্র"
-            onclick="openPaper('ইতিহাস ১ম পত্র')"
-          >
+            onclick="openPaper('ইতিহাস ১ম পত্র')">
             <div>
               <div class="paper-name">ইতিহাস ১ম পত্র</div>
               <small>History First Paper</small>
@@ -352,11 +318,9 @@
             <span class="arrow">›</span>
           </div>
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="ইতিহাস ২য় পত্র"
-            onclick="openPaper('ইতিহাস ২য় পত্র')"
-          >
+            onclick="openPaper('ইতিহাস ২য় পত্র')">
             <div>
               <div class="paper-name">ইতিহাস ২য় পত্র</div>
               <small>History Second Paper</small>
@@ -375,11 +339,9 @@
 
         <div class="paper-list">
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="ইসলামের ইতিহাস ও সংস্কৃতি ১ম পত্র"
-            onclick="openPaper('ইসলামের ইতিহাস ও সংস্কৃতি ১ম পত্র')"
-          >
+            onclick="openPaper('ইসলামের ইতিহাস ও সংস্কৃতি ১ম পত্র')">
             <div>
               <div class="paper-name">ইসলামের ইতিহাস ও সংস্কৃতি ১ম পত্র</div>
               <small>Islamic History First Paper</small>
@@ -387,11 +349,9 @@
             <span class="arrow">›</span>
           </div>
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="ইসলামের ইতিহাস ও সংস্কৃতি ২য় পত্র"
-            onclick="openPaper('ইসলামের ইতিহাস ও সংস্কৃতি ২য় পত্র')"
-          >
+            onclick="openPaper('ইসলামের ইতিহাস ও সংস্কৃতি ২য় পত্র')">
             <div>
               <div class="paper-name">ইসলামের ইতিহাস ও সংস্কৃতি ২য় পত্র</div>
               <small>Islamic History Second Paper</small>
@@ -410,11 +370,9 @@
 
         <div class="paper-list">
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="সমাজবিজ্ঞান ১ম পত্র"
-            onclick="openPaper('সমাজবিজ্ঞান ১ম পত্র')"
-          >
+            onclick="openPaper('সমাজবিজ্ঞান ১ম পত্র')">
             <div>
               <div class="paper-name">সমাজবিজ্ঞান ১ম পত্র</div>
               <small>Sociology First Paper</small>
@@ -422,11 +380,9 @@
             <span class="arrow">›</span>
           </div>
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="সমাজবিজ্ঞান ২য় পত্র"
-            onclick="openPaper('সমাজবিজ্ঞান ২য় পত্র')"
-          >
+            onclick="openPaper('সমাজবিজ্ঞান ২য় পত্র')">
             <div>
               <div class="paper-name">সমাজবিজ্ঞান ২য় পত্র</div>
               <small>Sociology Second Paper</small>
@@ -445,11 +401,9 @@
 
         <div class="paper-list">
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="যুক্তিবিদ্যা ১ম পত্র"
-            onclick="openPaper('যুক্তিবিদ্যা ১ম পত্র')"
-          >
+            onclick="openPaper('যুক্তিবিদ্যা ১ম পত্র')">
             <div>
               <div class="paper-name">যুক্তিবিদ্যা ১ম পত্র</div>
               <small>Logic First Paper</small>
@@ -457,11 +411,9 @@
             <span class="arrow">›</span>
           </div>
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="যুক্তিবিদ্যা ২য় পত্র"
-            onclick="openPaper('যুক্তিবিদ্যা ২য় পত্র')"
-          >
+            onclick="openPaper('যুক্তিবিদ্যা ২য় পত্র')">
             <div>
               <div class="paper-name">যুক্তিবিদ্যা ২য় পত্র</div>
               <small>Logic Second Paper</small>
@@ -480,11 +432,9 @@
 
         <div class="paper-list">
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="ভূগোল ১ম পত্র"
-            onclick="openPaper('ভূগোল ১ম পত্র')"
-          >
+            onclick="openPaper('ভূগোল ১ম পত্র')">
             <div>
               <div class="paper-name">ভূগোল ১ম পত্র</div>
               <small>Geography First Paper</small>
@@ -492,11 +442,9 @@
             <span class="arrow">›</span>
           </div>
 
-          <div
-            class="paper"
+          <div class="paper"
             data-name="ভূগোল ২য় পত্র"
-            onclick="openPaper('ভূগোল ২য় পত্র')"
-          >
+            onclick="openPaper('ভূগোল ২য় পত্র')">
             <div>
               <div class="paper-name">ভূগোল ২য় পত্র</div>
               <small>Geography Second Paper</small>
@@ -509,13 +457,9 @@
 
     </div>
 
-    <!-- EMPTY SEARCH RESULT -->
-
     <div class="empty" id="empty" style="display:none">
       কোনো বিষয় পাওয়া যায়নি।
     </div>
-
-    <!-- FOOTER -->
 
     <footer>
       EDU VERSE • LEARN WITHOUT LIMITS
@@ -584,6 +528,8 @@
       <span>TEST YOURSELF</span>
     </div>
 
+    <!-- MCQ PRACTICE -->
+
     <div class="practice-card">
 
       <div class="emoji">📝</div>
@@ -591,52 +537,56 @@
       <h3>MCQ Practice</h3>
 
       <p>
-        বিষয় ও অধ্যায়ভিত্তিক বহুনির্বাচনি অনুশীলন।
+        সাধারণ MCQ প্রশ্নের মাধ্যমে নিজের প্রস্তুতি যাচাই করো।
       </p>
 
       <button
         class="primary-btn"
         onclick="startPractice('mcq')"
       >
-        Start Practice →
+        Start MCQ Practice →
       </button>
 
     </div>
+
+    <!-- TIMER QUIZ -->
 
     <div class="practice-card">
 
       <div class="emoji">⏱️</div>
 
-      <h3>Timed Quiz</h3>
+      <h3>Timer Quiz</h3>
 
       <p>
-        সময় ধরে নিজের প্রস্তুতি যাচাই করো।
+        ৬০ সেকেন্ডের মধ্যে প্রশ্নের উত্তর দিয়ে নিজের দক্ষতা যাচাই করো।
       </p>
 
       <button
         class="primary-btn"
-        onclick="startPractice('timed')"
+        onclick="startPractice('timer')"
       >
-        Start Quiz →
+        Start Timer Quiz →
       </button>
 
     </div>
+
+    <!-- QUICK QUIZ -->
 
     <div class="practice-card">
 
       <div class="emoji">🎯</div>
 
-      <h3>Daily Quiz</h3>
+      <h3>Quick Quiz</h3>
 
       <p>
-        প্রতিদিন নতুন প্রশ্নের অনুশীলন করো।
+        অল্প সময়ে দ্রুত ৫টি প্রশ্নের উত্তর দাও।
       </p>
 
       <button
         class="primary-btn"
-        onclick="startPractice('daily')"
+        onclick="startPractice('quick')"
       >
-        Daily Challenge →
+        Start Quick Quiz →
       </button>
 
     </div>
@@ -658,11 +608,9 @@
     </div>
 
     <div id="savedList">
-
       <p class="muted">
         তোমার সংরক্ষিত নোট ও প্রশ্ন এখানে থাকবে।
       </p>
-
     </div>
 
   </div>
@@ -696,27 +644,18 @@
     </div>
 
     <div class="progress-card">
-
       <p>Completed Chapters</p>
-
       <strong id="completedCount">0</strong>
-
     </div>
 
     <div class="progress-card">
-
       <p>Quiz Attempts</p>
-
       <strong id="quizCount">0</strong>
-
     </div>
 
     <div class="progress-card">
-
       <p>Saved Items</p>
-
       <strong id="savedCount">0</strong>
-
     </div>
 
     <div class="section-title">
