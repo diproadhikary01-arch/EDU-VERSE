@@ -6,17 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#071512">
   <meta name="description" content="EDU VERSE - Your Personal HSC Learning World">
-
   <title>EDU VERSE | Premium Learning</title>
 
-  <!-- PREMIUM CSS -->
-  <link rel="stylesheet" href="/EDU-VERSE/style.css?v=20261105-2">
+  <link rel="stylesheet" href="./style.css?v=5">
 </head>
 
 <body>
 
-  <!-- AURORA BACKGROUND -->
+  <!-- ANIMATED BACKGROUND -->
   <div class="aurora-background">
+    <canvas id="networkBackground"></canvas>
     <div class="aurora aurora-one"></div>
     <div class="aurora aurora-two"></div>
   </div>
@@ -41,7 +40,6 @@
 
       <div class="hero">
         <span class="eyebrow">✦ PREMIUM LEARNING EXPERIENCE</span>
-
         <h2>Welcome to <span>EDU VERSE</span></h2>
 
         <p>
@@ -130,7 +128,7 @@
 
     </section>
 
-    <!-- CHAPTERS -->
+    <!-- CHAPTER LIST -->
     <section id="chapterPage" class="page">
 
       <button class="back-button" onclick="showPage('subjects')">
@@ -248,38 +246,41 @@
   <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
 
-    <button class="nav-item active" data-page="home" onclick="showPage('home',this)">
-      ⌂
-      <small>Home</small>
+    <button class="nav-item active" data-page="home"
+      onclick="showPage('home',this)">
+      ⌂<small>Home</small>
     </button>
 
-    <button class="nav-item" data-page="subjects" onclick="showPage('subjects',this)">
-      ▦
-      <small>Subjects</small>
+    <button class="nav-item" data-page="subjects"
+      onclick="showPage('subjects',this)">
+      ▦<small>Subjects</small>
     </button>
 
-    <button class="nav-item" data-page="practice" onclick="showPage('practice',this)">
-      ✦
-      <small>Practice</small>
+    <button class="nav-item" data-page="practice"
+      onclick="showPage('practice',this)">
+      ✦<small>Practice</small>
     </button>
 
-    <button class="nav-item" data-page="saved" onclick="showPage('saved',this)">
-      ♡
-      <small>Saved</small>
+    <button class="nav-item" data-page="saved"
+      onclick="showPage('saved',this)">
+      ♡<small>Saved</small>
     </button>
 
-    <button class="nav-item" data-page="profile" onclick="showPage('profile',this)">
-      ◎
-      <small>Profile</small>
+    <button class="nav-item" data-page="profile"
+      onclick="showPage('profile',this)">
+      ◎<small>Profile</small>
     </button>
 
   </nav>
 
-  <!-- CHAPTER DATABASE FIRST -->
-  <script src="/EDU-VERSE/chapters/bangla-1st.js?v=20261105-2"></script>
+  <!-- CHAPTER DATABASE -->
+  <script src="./chapters/bangla-1st.js?v=5"></script>
 
-  <!-- MAIN JAVASCRIPT SECOND -->
-  <script src="/EDU-VERSE/script.js?v=20261105-2"></script>
+  <!-- ANIMATED BACKGROUND ENGINE -->
+  <script src="./background.js?v=5"></script>
+
+  <!-- MAIN APPLICATION -->
+  <script src="./script.js?v=5"></script>
 
 </body>
 </html>
