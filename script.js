@@ -509,15 +509,121 @@
 
   /* CHAPTER CONTENT */
 
+  /* Turns raw multi-line text into clean paragraphs.
+     - blank line  = new paragraph
+     - single line breaks inside a paragraph are joined with a space
+     - "Label:" lines become small gold tags */
+  function formatRichText(text) {
+    const clean = String(text ?? "").replace(/\r/g, "").trim();
+    if (!clean) return "";
+
+    const isLabel = line => /:$/.test(line) && line.length <= 40;
+
+    return clean.split(/\n\s*\n/).map(block => {
+      const lines = block.split("\n").map(l => l.trim()).filter(Boolean);
+      if (!lines.length) return "";
+
+      if (lines.length === 1 && isLabel(lines[0])) {
+        return `<h5 class="rich-label">${escapeHTML(lines[0].replace(/:$/, ""))}</h5>`;
+      }
+
+      if (lines.length >= 2 && isLabel(lines[0])) {
+        return `
+          <div class="rich-group">
+            <span class="rich-tag">${escapeHTML(lines[0].replace(/:$/, ""))}</span>
+            <p>${escapeHTML(lines.slice(1).join(" "))}</p>
+          </div>`;
+      }
+
+      return `<p>${escapeHTML(lines.join(" "))}</p>`;
+    }).join("");
+  }
+
   function textBlock(title, content) {
     if (!content) return "";
 
     return `
       <section class="study-section">
         <h3>${escapeHTML(title)}</h3>
-        <div class="section-content">${escapeHTML(content)}</div>
+        <div class="rich-text">${formatRichText(content)}</div>
       </section>
     `;
+  }
+
+  /* Adds icons, a quick-jump bar and stat chips after the chapter renders. */
+  function enhanceChapterDetails(chapter) {
+    const root = document.getElementById("chapterDetails");
+    if (!root) return;
+
+    const iconMap = [
+      ["পাঠ পরিচিতি", "📖", "intro"],
+      ["লেখক পরিচিতি", "✍️", "author"],
+      ["সারসংক্ষেপ", "🧭", "summary"],
+      ["বিষয়বস্তু", "💡", "theme"],
+      ["চরিত্র", "👥", "characters"],
+      ["বিস্তারিত আলোচনা", "🗂️", "discussion"],
+      ["শব্দার্থ", "🔤", "words"],
+      ["ব্যাখ্যা", "🧠", "explain"],
+      ["MCQ", "🎯", "mcq"],
+      ["সৃজনশীল", "📝", "cq"],
+      ["Revision", "🔁", "revision"],
+      ["টিপস", "⭐", "tips"],
+      ["তথ্যসূত্র", "🔗", "source"]
+    ];
+
+    const jumpItems = [];
+
+    root.querySelectorAll(".study-section").forEach(section => {
+      const heading = section.querySelector(":scope > h3");
+      if (!heading) return;
+
+      const text = heading.textContent.trim();
+      const match = iconMap.find(([word]) => text.includes(word));
+      const icon = match ? match[1] : "✦";
+      const id = "sec-" + (match ? match[2] : jumpItems.length);
+
+      section.id = id;
+      heading.innerHTML = `<span class="section-icon">${icon}</span><span>${escapeHTML(text)}</span>`;
+
+      const shortLabel = text.replace(/\(.*?\)/g, "").split("—")[0].trim();
+      jumpItems.push({ id, icon, label: shortLabel });
+    });
+
+    const hero = root.querySelector(".chapter-hero");
+    if (!hero) return;
+
+    const stats = [];
+    if (chapter.mcq?.length) stats.push(`🎯 ${chapter.mcq.length} MCQ`);
+    if (chapter.cq?.length) stats.push(`📝 ${chapter.cq.length} CQ`);
+    if ((chapter.vocabulary || []).length) stats.push(`🔤 ${chapter.vocabulary.length} শব্দ`);
+    if (chapter.characters?.length) stats.push(`👥 ${chapter.characters.length} চরিত্র`);
+
+    if (stats.length) {
+      const chips = document.createElement("div");
+      chips.className = "hero-chips";
+      chips.innerHTML = stats.map(s => `<span>${escapeHTML(s)}</span>`).join("");
+      hero.insertBefore(chips, hero.querySelector(".chapter-actions"));
+    }
+
+    if (jumpItems.length > 1) {
+      const nav = document.createElement("div");
+      nav.className = "jump-bar";
+      nav.innerHTML = jumpItems.map(item => `
+        <button type="button" data-target="${item.id}">
+          ${item.icon} ${escapeHTML(item.label)}
+        </button>
+      `).join("");
+
+      nav.addEventListener("click", event => {
+        const button = event.target.closest("button[data-target]");
+        if (!button) return;
+
+        document.getElementById(button.dataset.target)
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      hero.insertAdjacentElement("afterend", nav);
+    }
   }
 
   function renderArrayItems(items, type) {
@@ -527,7 +633,7 @@
       return items.map(item => `
         <div class="discussion-item">
           <h4>${escapeHTML(item.heading || "")}</h4>
-          <p>${escapeHTML(item.details || item.description || "")}</p>
+          <div class="rich-text">${formatRichText(item.details || item.description || "")}</div>
         </div>
       `).join("");
     }
@@ -535,8 +641,11 @@
     if (type === "characters") {
       return items.map(item => `
         <div class="character-item">
-          <h4>${escapeHTML(item.name || "")}</h4>
-          <p>${escapeHTML(item.description || "")}</p>
+          <span class="character-avatar">${escapeHTML(String(item.name || "?").trim().charAt(0))}</span>
+          <div class="character-body">
+            <h4>${escapeHTML(item.name || "")}</h4>
+            <div class="rich-text">${formatRichText(item.description || "")}</div>
+          </div>
         </div>
       `).join("");
     }
@@ -753,6 +862,7 @@
       }
     `;
 
+    enhanceChapterDetails(chapter);
     showPage("chapterDetails");
   }
 
