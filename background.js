@@ -1,497 +1,172 @@
-
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#071512">
-  <meta name="description" content="EDU VERSE - HSC Learning Platform">
-  <meta name="color-scheme" content="dark light">
-
-  <title>EDU VERSE | Premium Learning</title>
-
-  <link rel="stylesheet" href="./style.css?v=8">
-</head>
-
-<body>
-
-  <!-- BACKGROUND -->
-  <div class="aurora-background">
-    <canvas id="networkBackground"></canvas>
-    <div class="aurora aurora-one"></div>
-    <div class="aurora aurora-two"></div>
-  </div>
-
-  <!-- HEADER -->
-  <header class="header">
-
-    <button
-      class="header-profile"
-      onclick="showPage('profile')"
-      aria-label="Open profile"
-    >
-      <img
-        id="headerProfileImage"
-        class="header-avatar"
-        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%23173529'/%3E%3Ctext x='50' y='65' font-size='48' text-anchor='middle' fill='%23e6bd65'%3E%E2%98%BA%3C/text%3E%3C/svg%3E"
-        alt="Profile"
-      >
-
-      <span class="header-user-info">
-        <strong id="headerUserName">Your Name</strong>
-        <small id="headerUserSubtitle">HSC Student</small>
-      </span>
-    </button>
-
-    <div class="header-tools">
-
-      <button
-        class="header-tool"
-        id="themeToggle"
-        onclick="toggleTheme()"
-        aria-label="Toggle theme"
-        title="Change theme"
-      >🌙</button>
-
-      <button
-        class="header-tool"
-        id="languageToggle"
-        onclick="toggleLanguage()"
-        aria-label="Change language"
-        title="Change language"
-      >EN</button>
-
-    </div>
-  </header>
-
-  <!-- MAIN CONTENT -->
-  <main class="container">
-
-    <!-- HOME -->
-    <section id="homePage" class="page active">
-
-      <div class="hero">
-        <span class="eyebrow">✦ YOUR LEARNING JOURNEY</span>
-
-        <h2>WELCOME TO <span>EDU VERSE</span></h2>
-
-        <p>
-          তোমার HSC প্রস্তুতির সম্পূর্ণ শিক্ষাজগৎ।
-          পড়ো, অনুশীলন করো এবং নিজের সাফল্যের পথে এগিয়ে যাও।
-        </p>
-
-        <button
-          class="primary-button"
-          onclick="showPage('subjects')"
-        >
-          Start Learning <span>→</span>
-        </button>
-      </div>
-
-      <div class="stats-grid">
-
-        <div class="stat-card">
-          <strong>14+</strong>
-          <span>Subjects</span>
-        </div>
-
-        <div class="stat-card">
-          <strong id="completedCountHome">0</strong>
-          <span>Completed</span>
-        </div>
-
-        <div class="stat-card">
-          <strong id="quizCountHome">0</strong>
-          <span>Quizzes</span>
-        </div>
-
-      </div>
-
-      <div class="section-heading">
-        <h2>Quick Access</h2>
-        <span>EXPLORE</span>
-      </div>
-
-      <div class="quick-grid">
-
-        <button
-          class="quick-card"
-          onclick="showPage('subjects')"
-        >
-          <span class="quick-icon">📚</span>
-          <b>Subjects</b>
-          <small>বিষয় নির্বাচন</small>
-        </button>
-
-        <button
-          class="quick-card"
-          onclick="showPage('practice')"
-        >
-          <span class="quick-icon">📝</span>
-          <b>Practice</b>
-          <small>অনুশীলন</small>
-        </button>
-
-        <button
-          class="quick-card"
-          onclick="startPractice('mcq')"
-        >
-          <span class="quick-icon">🎯</span>
-          <b>MCQ Practice</b>
-          <small>প্রশ্ন অনুশীলন</small>
-        </button>
-
-        <button
-          class="quick-card"
-          onclick="showPage('saved')"
-        >
-          <span class="quick-icon">🔖</span>
-          <b>Saved Notes</b>
-          <small>সংরক্ষিত অধ্যায়</small>
-        </button>
-
-      </div>
-
-    </section>
-
-    <!-- SUBJECTS -->
-    <section id="subjectsPage" class="page">
-
-      <div class="page-heading">
-        <span class="eyebrow">YOUR STUDY LIBRARY</span>
-        <h2>All Subjects</h2>
-        <p>তোমার পছন্দের বিষয় নির্বাচন করো।</p>
-      </div>
-
-      <div id="allSubjectList" class="subject-list"></div>
-
-    </section>
-
-    <!-- CHAPTERS -->
-    <section id="chapterPage" class="page">
-
-      <button
-        class="back-button"
-        onclick="showPage('subjects')"
-      >
-        ← Back to Subjects
-      </button>
-
-      <div class="page-heading">
-        <span class="eyebrow">CHAPTER LIBRARY</span>
-        <h2 id="paperTitle">Chapters</h2>
-        <p>অধ্যায় নির্বাচন করে বিস্তারিত পড়া শুরু করো।</p>
-      </div>
-
-      <div id="chapterList" class="chapter-list"></div>
-
-    </section>
-
-    <!-- PRACTICE -->
-    <section id="practicePage" class="page">
-
-      <div class="page-heading">
-        <span class="eyebrow">TEST YOUR KNOWLEDGE</span>
-        <h2>Practice Zone</h2>
-        <p>নিজেকে যাচাই করো এবং প্রস্তুতি আরও শক্তিশালী করো।</p>
-      </div>
-
-      <div class="practice-grid">
-
-        <button
-          class="practice-card"
-          onclick="startPractice('mcq')"
-        >
-          <span>🎯</span>
-          <h3>MCQ Practice</h3>
-          <p>অধ্যায়ের প্রশ্নব্যাংক থেকে অনুশীলন।</p>
-          <b>Start Practice →</b>
-        </button>
-
-        <button
-          class="practice-card"
-          onclick="startPractice('timer')"
-        >
-          <span>⏱️</span>
-          <h3>Timer Quiz</h3>
-          <p>সময় ধরে নিজের দক্ষতা যাচাই করো।</p>
-          <b>Start Quiz →</b>
-        </button>
-
-        <button
-          class="practice-card"
-          onclick="startPractice('quick')"
-        >
-          <span>⚡</span>
-          <h3>Quick Quiz</h3>
-          <p>৫টি প্রশ্নে দ্রুত পরীক্ষা।</p>
-          <b>Start Quick Quiz →</b>
-        </button>
-
-      </div>
-
-    </section>
-
-    <!-- SAVED -->
-    <section id="savedPage" class="page">
-
-      <div class="page-heading">
-        <span class="eyebrow">YOUR COLLECTION</span>
-        <h2>Saved Chapters</h2>
-        <p>তোমার সংরক্ষিত অধ্যায়গুলো এখানে থাকবে।</p>
-      </div>
-
-      <div id="savedList" class="chapter-list"></div>
-
-    </section>
-
-    <!-- STUDENT PROFILE -->
-    <section id="profilePage" class="page">
-
-      <div class="page-heading">
-        <span class="eyebrow">PERSONAL STUDENT ACCOUNT</span>
-        <h2>My Profile</h2>
-        <p>তোমার ব্যক্তিগত ও শিক্ষাগত তথ্য সাজিয়ে রাখো।</p>
-      </div>
-
-      <div class="profile-card">
-
-        <div class="profile-photo-wrapper">
-
-          <img
-            id="profilePreview"
-            class="profile-avatar"
-            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%23173529'/%3E%3Ctext x='50' y='65' font-size='48' text-anchor='middle' fill='%23e6bd65'%3E%E2%98%BA%3C/text%3E%3C/svg%3E"
-            alt="Student profile picture"
-          >
-
-          <label
-            for="profileImageInput"
-            class="photo-upload-button"
-          >
-            📷 Change Photo
-          </label>
-
-          <input
-            type="file"
-            id="profileImageInput"
-            accept="image/*"
-            hidden
-          >
-
-        </div>
-
-        <h3 id="profileDisplayName">Your Name</h3>
-        <p id="profileDisplayBatch">HSC Student</p>
-
-      </div>
-
-      <!-- PROFILE FORM -->
-      <form id="studentProfileForm" class="profile-form">
-
-        <div class="section-heading">
-          <h2>Personal Information</h2>
-        </div>
-
-        <label for="studentName">Full Name</label>
-
-        <input
-          id="studentName"
-          name="studentName"
-          type="text"
-          placeholder="তোমার সম্পূর্ণ নাম"
-          maxlength="60"
-        >
-
-        <label for="studentUsername">Username</label>
-
-        <input
-          id="studentUsername"
-          name="studentUsername"
-          type="text"
-          placeholder="তোমার Username"
-          maxlength="30"
-        >
-
-        <label for="studentAbout">About Me</label>
-
-        <textarea
-          id="studentAbout"
-          name="studentAbout"
-          rows="3"
-          placeholder="নিজের সম্পর্কে কিছু লিখো..."
-          maxlength="300"
-        ></textarea>
-
-        <div class="section-heading">
-          <h2>Education Information</h2>
-        </div>
-
-        <label for="studentBatch">HSC Batch</label>
-
-        <input
-          id="studentBatch"
-          name="studentBatch"
-          type="number"
-          placeholder="যেমন: 2027"
-          min="2000"
-          max="2100"
-        >
-
-        <label for="studentCollege">College Name</label>
-
-        <input
-          id="studentCollege"
-          name="studentCollege"
-          type="text"
-          placeholder="তোমার কলেজের নাম"
-          maxlength="100"
-        >
-
-        <label for="studentBoard">Education Board</label>
-
-        <select id="studentBoard" name="studentBoard">
-          <option value="">বোর্ড নির্বাচন করো</option>
-          <option value="Dhaka">Dhaka</option>
-          <option value="Cumilla">Cumilla</option>
-          <option value="Chattogram">Chattogram</option>
-          <option value="Rajshahi">Rajshahi</option>
-          <option value="Jashore">Jashore</option>
-          <option value="Barishal">Barishal</option>
-          <option value="Sylhet">Sylhet</option>
-          <option value="Dinajpur">Dinajpur</option>
-          <option value="Mymensingh">Mymensingh</option>
-          <option value="Madrasah">Madrasah</option>
-          <option value="Technical">Technical</option>
-        </select>
-
-        <label for="studentGroup">Academic Group</label>
-
-        <select id="studentGroup" name="studentGroup">
-          <option value="">গ্রুপ নির্বাচন করো</option>
-          <option value="Humanities">Humanities</option>
-          <option value="Science">Science</option>
-          <option value="Business Studies">Business Studies</option>
-        </select>
-
-        <label for="studentSession">HSC Session</label>
-
-        <input
-          id="studentSession"
-          name="studentSession"
-          type="text"
-          placeholder="যেমন: 2025-2026"
-          maxlength="20"
-        >
-
-        <button
-          type="submit"
-          class="primary-button profile-save-button"
-        >
-          💾 Save Profile
-        </button>
-
-      </form>
-
-      <!-- LEARNING PROGRESS -->
-      <div class="section-heading">
-        <h2>My Learning Progress</h2>
-      </div>
-
-      <div class="stats-grid">
-
-        <div class="stat-card">
-          <strong id="completedCount">0</strong>
-          <span>Completed</span>
-        </div>
-
-        <div class="stat-card">
-          <strong id="quizCount">0</strong>
-          <span>Quizzes</span>
-        </div>
-
-        <div class="stat-card">
-          <strong id="savedCount">0</strong>
-          <span>Saved</span>
-        </div>
-
-      </div>
-
-      <button
-        class="secondary-button"
-        onclick="resetProgress()"
-      >
-        Reset Learning Progress
-      </button>
-
-    </section>
-
-    <!-- CHAPTER DETAILS -->
-    <section id="chapterDetailsPage" class="page">
-      <div id="chapterDetails"></div>
-    </section>
-
-    <!-- QUIZ -->
-    <section id="quizPage" class="page">
-      <div id="quizContent"></div>
-    </section>
-
-  </main>
-
-  <!-- BOTTOM NAVIGATION -->
-  <nav class="bottom-nav">
-
-    <button
-      class="nav-item active"
-      data-page="home"
-      onclick="showPage('home',this)"
-    >
-      ⌂
-      <small>Home</small>
-    </button>
-
-    <button
-      class="nav-item"
-      data-page="subjects"
-      onclick="showPage('subjects',this)"
-    >
-      ▦
-      <small>Subjects</small>
-    </button>
-
-    <button
-      class="nav-item"
-      data-page="practice"
-      onclick="showPage('practice',this)"
-    >
-      ✦
-      <small>Practice</small>
-    </button>
-
-    <button
-      class="nav-item"
-      data-page="saved"
-      onclick="showPage('saved',this)"
-    >
-      ♡
-      <small>Saved</small>
-    </button>
-
-    <button
-      class="nav-item"
-      data-page="profile"
-      onclick="showPage('profile',this)"
-    >
-      ◎
-      <small>Profile</small>
-    </button>
-
-  </nav>
-
-  <!-- APPLICATION SCRIPTS -->
-  <script src="./chapters/bangla-1st.js?v=8"></script>
-  <script src="./background.js?v=8"></script>
-  <script src="./script.js?v=8"></script>
-
-</body>
-</html>
+"use strict";
+
+/* =========================================
+   EDU VERSE — NETWORK ANIMATION ENGINE
+   Floating Particles + Connecting Lines
+========================================= */
+
+(() => {
+  const canvas = document.getElementById("networkBackground");
+
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) return;
+
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  if (reducedMotion) return;
+
+  let width = 0;
+  let height = 0;
+  let particles = [];
+  let animationId = null;
+  let lastFrame = 0;
+
+  const settings = {
+    particleSize: 2,
+    connectionDistance: 125,
+    speed: 0.32,
+    density: 8500,
+    maxParticles: 100
+  };
+
+  function resizeCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    createParticles();
+  }
+
+  function createParticles() {
+    const count = Math.min(
+      settings.maxParticles,
+      Math.max(35, Math.floor((width * height) / settings.density))
+    );
+
+    particles = [];
+
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * settings.speed,
+        vy: (Math.random() - 0.5) * settings.speed,
+        radius: Math.random() * 1.7 + 1,
+        alpha: Math.random() * 0.45 + 0.25
+      });
+    }
+  }
+
+  function drawParticles() {
+    for (const p of particles) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+
+      ctx.fillStyle = `rgba(105, 230, 177, ${p.alpha})`;
+      ctx.fill();
+    }
+  }
+
+  function drawConnections() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const a = particles[i];
+        const b = particles[j];
+
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < settings.connectionDistance) {
+          const opacity =
+            (1 - distance / settings.connectionDistance) * 0.23;
+
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+
+          ctx.strokeStyle = `rgba(75, 205, 151, ${opacity})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function updateParticles() {
+    for (const p of particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < -10 || p.x > width + 10) {
+        p.vx *= -1;
+      }
+
+      if (p.y < -10 || p.y > height + 10) {
+        p.vy *= -1;
+      }
+    }
+  }
+
+  function animate(timestamp) {
+    animationId = null;
+
+    if (document.hidden) return;
+
+    if (timestamp - lastFrame < 32) {
+      animationId = requestAnimationFrame(animate);
+      return;
+    }
+
+    lastFrame = timestamp;
+
+    ctx.clearRect(0, 0, width, height);
+
+    updateParticles();
+    drawConnections();
+    drawParticles();
+
+    animationId = requestAnimationFrame(animate);
+  }
+
+  function startAnimation() {
+    if (!animationId && !document.hidden) {
+      animationId = requestAnimationFrame(animate);
+    }
+  }
+
+  function stopAnimation() {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopAnimation();
+    } else {
+      startAnimation();
+    }
+  });
+
+  window.addEventListener("resize", resizeCanvas);
+
+  resizeCanvas();
+  startAnimation();
+
+})();
