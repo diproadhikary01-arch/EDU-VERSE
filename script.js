@@ -2,674 +2,938 @@
 "use strict";
 
 /* =========================================
-   EDU VERSE — COMPLETE LEARNING ENGINE
-========================================= */
-
-const pageNames = [
-  "home", "subjects", "practice", "saved",
-  "profile", "chapter", "chapterDetails", "quiz"
-];
-
-const STORAGE = {
-  saved: "eduVerseSaved",
-  completed: "eduVerseCompleted",
-  quiz: "eduVerseQuizCount",
-  score: "eduVerseQuizScore"
-};
-
-const subjects = [
-  "বাংলা ১ম পত্র", "বাংলা ২য় পত্র",
-  "ইংরেজি ১ম পত্র", "ইংরেজি ২য় পত্র",
-  "তথ্য ও যোগাযোগ প্রযুক্তি",
-  "পৌরনীতি ১ম পত্র", "পৌরনীতি ২য় পত্র",
-  "অর্থনীতি ১ম পত্র", "অর্থনীতি ২য় পত্র",
-  "ইতিহাস ১ম পত্র", "ইতিহাস ২য় পত্র",
-  "ইসলামের ইতিহাস ১ম পত্র", "ইসলামের ইতিহাস ২য় পত্র",
-  "সমাজবিজ্ঞান ১ম পত্র", "সমাজবিজ্ঞান ২য় পত্র",
-  "যুক্তিবিদ্যা ১ম পত্র", "যুক্তিবিদ্যা ২য় পত্র",
-  "ভূগোল ১ম পত্র", "ভূগোল ২য় পত্র"
-];
-
-const chapterDatabase = window.EDU_VERSE_CHAPTERS || {};
-
-let currentChapter = null;
-let currentPractice = "mcq";
-let currentQuestions = [];
-let currentQuestion = 0;
-let currentScore = 0;
-let quizAnswered = false;
-let quizTimer = null;
-let remainingTime = 60;
-let quizFinished = false;
-
-function readStorage(key, fallback = []) {
-  try {
-    return JSON.parse(localStorage.getItem(key)) ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function writeStorage(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
-function escapeHTML(value = "") {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  })[char]);
-}
-
-function formatText(value) {
-  return escapeHTML(value).replace(/\n/g, "<br>");
-}
-
-function showPage(name, button) {
-  document.querySelectorAll(".page").forEach(page => {
-    page.classList.remove("active", "page-slide-next", "page-slide-prev");
-  });
-
-  const target = document.getElementById(name + "Page");
-  if (!target) return;
-
-  target.classList.add("active");
-
-  document.querySelectorAll(".nav-item").forEach(nav => {
-    nav.classList.remove("active");
-  });
-
-  const navButton = button ||
-    document.querySelector(`.nav-item[data-page="${name}"]`);
-
-  if (navButton) navButton.classList.add("active");
-
-  if (name === "saved") renderSaved();
-  if (name === "profile") updateProgress();
-}
-
-function renderSubjects(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  container.innerHTML = subjects.map(subject => `
-    <button class="subject-card" onclick="openPaper('${escapeHTML(subject)}')">
-      <span class="subject-icon">📘</span>
-      <span>${escapeHTML(subject)}</span>
-      <span class="subject-arrow">→</span>
-    </button>
-  `).join("");
-}
-
-function openPaper(name) {
-  currentChapter = null;
-
-  document.getElementById("paperTitle").textContent = name;
-
-  const list = document.getElementById("chapterList");
-
-  if (name === "বাংলা ১ম পত্র" && chapterDatabase["অপরিচিতা"]) {
-    const chapter = chapterDatabase["অপরিচিতা"];
-
-    list.innerHTML = `
-      <button class="chapter-item" onclick="openChapterDetails('অপরিচিতা')">
-        <div class="chapter-number">01</div>
-        <div class="chapter-info">
-          <h3>অপরিচিতা</h3>
-          <p>রবীন্দ্রনাথ ঠাকুর · ছোটগল্প</p>
-          <span class="content-status">সম্পূর্ণ অধ্যায় প্যাক</span>
-        </div>
-        <span>→</span>
-      </button>
-    `;
-
-    list.insertAdjacentHTML("beforeend", `
-      <div class="coming-soon">
-        <h3>আরও অধ্যায় আসছে</h3>
-        <p>বিলাসীসহ বাংলা ১ম পত্রের বাকি অধ্যায়গুলো পর্যায়ক্রমে যুক্ত করা হবে।</p>
-      </div>
-    `);
-  } else {
-    list.innerHTML = `
-      <div class="coming-soon">
-        <h3>অধ্যায় প্রস্তুত হচ্ছে</h3>
-        <p>এই বিষয়ের বিস্তারিত অধ্যায় ও প্রশ্নব্যাংক শীঘ্রই যুক্ত হবে।</p>
-      </div>
-    `;
-  }
-
-  showPage("chapter");
-}
-
-function section(title, content, icon = "✦") {
-  if (!content) return "";
-
-  return `
-    <article class="study-section">
-      <h3>${icon} ${escapeHTML(title)}</h3>
-      <div class="section-content">${formatText(content)}</div>
-    </article>
-  `;
-}
-
-function openChapterDetails(title) {
-  const chapter = chapterDatabase[title];
-  if (!chapter) return;
-
-  currentChapter = chapter;
-
-  const details = document.getElementById("chapterDetails");
-  const saved = readStorage(STORAGE.saved);
-  const completed = readStorage(STORAGE.completed);
-
-  const isSaved = saved.includes(chapter.id);
-  const isCompleted = completed.includes(chapter.id);
-
-  const discussions = Array.isArray(chapter.discussion)
-    ? chapter.discussion.map((item, index) => `
-      <article class="discussion-item">
-        <h4>${index + 1}. ${escapeHTML(item.heading || "")}</h4>
-        <p>${formatText(item.details || "")}</p>
-      </article>
-    `).join("")
-    : section("আলোচনা", chapter.discussion);
-
-  const characters = (chapter.characters || []).map(person => `
-    <article class="character-item">
-      <h4>${escapeHTML(person.name)}</h4>
-      <p>${formatText(person.description)}</p>
-    </article>
-  `).join("");
-
-  const vocabulary = (chapter.vocabulary || chapter.words || []).map(word => `
-    <div class="vocabulary-item">
-      <strong>${escapeHTML(word.word || "")}</strong>
-      <span>${formatText(word.meaning || "")}</span>
-    </div>
-  `).join("");
-
-  const explanations = (chapter.explanations || []).map(item => `
-    <article class="discussion-item">
-      <h4>${escapeHTML(item.heading || "")}</h4>
-      <p>${formatText(item.details || "")}</p>
-    </article>
-  `).join("");
-
-  const cqs = (chapter.cq || []).map((item, index) => `
-    <article class="cq-card">
-      <h4>সৃজনশীল প্রশ্ন ${index + 1}</h4>
-      <p class="stimulus">${formatText(item.stimulus || "")}</p>
-      <p>${formatText(item.question || "")}</p>
-      <div class="cq-subquestions">
-        ${Object.entries(item.subQuestions || {}).map(([key, value]) => `
-          <p><strong>${escapeHTML(key)}.</strong> ${formatText(value)}</p>
-        `).join("")}
-      </div>
-      <details>
-        <summary>উত্তর লেখার নির্দেশনা দেখুন</summary>
-        ${(item.guidance || []).map((guide, i) => `
-          <p>${i + 1}. ${formatText(guide)}</p>
-        `).join("")}
-      </details>
-    </article>
-  `).join("");
-
-  const revisions = (chapter.revision || []).map((item, index) => `
-    <details class="revision-item">
-      <summary>${index + 1}. ${escapeHTML(item.question || "")}</summary>
-      <p>${formatText(item.answer || "")}</p>
-    </details>
-  `).join("");
-
-  const tips = (chapter.studyTips || []).map(tip =>
-    `<li>${formatText(tip)}</li>`
-  ).join("");
-
-  details.innerHTML = `
-    <button class="back-button" onclick="showPage('chapter')">← Back to Chapters</button>
-
-    <div class="chapter-hero">
-      <span class="eyebrow">${escapeHTML(chapter.paper || "HSC")}</span>
-      <h2>${escapeHTML(chapter.title)}</h2>
-      <p>${escapeHTML(chapter.author || "")} · ${escapeHTML(chapter.type || "")}</p>
-
-      <div class="chapter-actions">
-        <button class="secondary-button" onclick="toggleSaveCurrent()">
-          ${isSaved ? "♥ Saved" : "♡ Save Chapter"}
-        </button>
-        <button class="secondary-button" onclick="toggleCompletedCurrent()">
-          ${isCompleted ? "✓ Completed" : "Mark Completed"}
-        </button>
-        <button class="primary-button" onclick="startChapterPractice()">
-          Practice MCQ →
-        </button>
-      </div>
-    </div>
-
-    ${section("পাঠ পরিচিতি", chapter.introduction || chapter.intro, "📖")}
-    ${section("লেখক পরিচিতি", chapter.authorInfo, "✍️")}
-    ${section("কাহিনির সারসংক্ষেপ", chapter.summary, "📚")}
-    ${section("মূলভাব ও বিষয়বস্তু", chapter.theme, "💡")}
-
-    ${characters ? `
-      <section class="study-section">
-        <h3>👥 চরিত্র পরিচিতি</h3>
-        ${characters}
-      </section>` : ""}
-
-    <section class="study-section">
-      <h3>📝 বিস্তারিত আলোচনা</h3>
-      ${discussions}
-    </section>
-
-    ${vocabulary ? `
-      <section class="study-section">
-        <h3>📕 শব্দার্থ</h3>
-        <div class="vocabulary-list">${vocabulary}</div>
-      </section>` : ""}
-
-    ${explanations ? `
-      <section class="study-section">
-        <h3>🔍 গুরুত্বপূর্ণ ব্যাখ্যা</h3>
-        ${explanations}
-      </section>` : ""}
-
-    <section class="study-section">
-      <h3>🎯 MCQ প্রশ্নব্যাংক (${(chapter.mcq || []).length}টি)</h3>
-      <p>প্রশ্নগুলো অনুশীলনের জন্য MCQ Practice শুরু করো।</p>
-      <button class="primary-button" onclick="startChapterPractice()">সব MCQ অনুশীলন করো →</button>
-    </section>
-
-    ${cqs ? `
-      <section class="study-section">
-        <h3>✍️ সৃজনশীল প্রশ্ন (CQ)</h3>
-        ${cqs}
-      </section>` : ""}
-
-    ${revisions ? `
-      <section class="study-section">
-        <h3>🔄 দ্রুত রিভিশন</h3>
-        ${revisions}
-      </section>` : ""}
-
-    ${tips ? `
-      <section class="study-section">
-        <h3>⭐ পরীক্ষার প্রস্তুতি টিপস</h3>
-        <ul class="tips-list">${tips}</ul>
-      </section>` : ""}
-
-    ${chapter.sourceInfo ? `
-      <section class="study-section">
-        <h3>📚 উৎস ও পাঠ্যক্রম</h3>
-        ${formatText(chapter.sourceInfo.note || "")}
-        ${formatText(chapter.sourceInfo.syllabusNote || "")}
-        ${(chapter.sourceInfo.references || []).map(ref => `<p>• ${formatText(ref)}</p>`).join("")}
-      </section>` : ""}
-  `;
-
-  showPage("chapterDetails");
-}
-
-function toggleSaveCurrent() {
-  if (!currentChapter) return;
-
-  let saved = readStorage(STORAGE.saved);
-  const id = currentChapter.id;
-
-  saved = saved.includes(id)
-    ? saved.filter(item => item !== id)
-    : [...saved, id];
-
-  writeStorage(STORAGE.saved, saved);
-  updateProgress();
-  openChapterDetails(currentChapter.title);
-}
-
-function toggleCompletedCurrent() {
-  if (!currentChapter) return;
-
-  let completed = readStorage(STORAGE.completed);
-  const id = currentChapter.id;
-
-  completed = completed.includes(id)
-    ? completed.filter(item => item !== id)
-    : [...completed, id];
-
-  writeStorage(STORAGE.completed, completed);
-  updateProgress();
-  openChapterDetails(currentChapter.title);
-}
-
-function renderSaved() {
-  const container = document.getElementById("savedList");
-  const saved = readStorage(STORAGE.saved);
-
-  if (!saved.length) {
-    container.innerHTML = `<div class="empty-state">🔖<h3>কোনো অধ্যায় সংরক্ষিত নেই</h3><p>পছন্দের অধ্যায় Save করলে এখানে দেখতে পাবে।</p></div>`;
-    return;
-  }
-
-  container.innerHTML = saved.map(id => {
-    const chapter = Object.values(chapterDatabase).find(item => item.id === id);
-    if (!chapter) return "";
-
-    return `
-      <button class="chapter-item" onclick="openChapterDetails('${escapeHTML(chapter.title)}')">
-        <div class="chapter-number">📘</div>
-        <div class="chapter-info">
-          <h3>${escapeHTML(chapter.title)}</h3>
-          <p>${escapeHTML(chapter.author || "")}</p>
-        </div>
-        <span>→</span>
-      </button>
-    `;
-  }).join("");
-}
-
-function updateProgress() {
-  const saved = readStorage(STORAGE.saved);
-  const completed = readStorage(STORAGE.completed);
-  const quizCount = Number(localStorage.getItem(STORAGE.quiz) || 0);
-
-  const values = {
-    completedCount: completed.length,
-    quizCount,
-    savedCount: saved.length,
-    completedCountHome: completed.length,
-    quizCountHome: quizCount
-  };
-
-  Object.entries(values).forEach(([id, value]) => {
-    const element = document.getElementById(id);
-    if (element) element.textContent = value;
-  });
-}
-
-/* =========================================
-   QUIZ ENGINE
-========================================= */
-
-function shuffle(array) {
-  const copy = [...array];
-
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-
-  return copy;
-}
-
-function getQuestionBank() {
-  if (currentChapter && currentChapter.mcq?.length) {
-    return currentChapter.mcq;
-  }
-
-  return Object.values(chapterDatabase)
-    .flatMap(chapter => chapter.mcq || []);
-}
-
-function startChapterPractice() {
-  if (!currentChapter) return;
-  startPractice("mcq", currentChapter);
-}
-
-function startPractice(mode, chapter = null) {
-  clearInterval(quizTimer);
-
-  currentPractice = mode;
-  currentChapter = chapter || currentChapter;
-
-  const bank = chapter
-    ? chapter.mcq || []
-    : getQuestionBank();
-
-  if (!bank.length) {
-    alert("এখনো কোনো MCQ প্রশ্ন যুক্ত করা হয়নি।");
-    return;
-  }
-
-  if (mode === "quick") {
-    currentQuestions = shuffle(bank).slice(0, 5);
-  } else if (mode === "timer") {
-    currentQuestions = shuffle(bank).slice(0, 10);
-  } else {
-    currentQuestions = [...bank];
-  }
-
-  currentQuestion = 0;
-  currentScore = 0;
-  quizAnswered = false;
-  quizFinished = false;
-  remainingTime = 60;
-
-  if (mode === "timer") {
-    startTimer();
-  }
-
-  renderQuestion();
-  showPage("quiz");
-}
-
-function startTimer() {
-  updateTimerDisplay();
-
-  quizTimer = setInterval(() => {
-    remainingTime--;
-    updateTimerDisplay();
-
-    if (remainingTime <= 0) {
-      clearInterval(quizTimer);
-      finishQuiz(true);
-    }
-  }, 1000);
-}
-
-function updateTimerDisplay() {
-  const timer = document.getElementById("timerDisplay");
-  if (timer) timer.textContent = remainingTime + "s";
-}
-
-function renderQuestion() {
-  const question = currentQuestions[currentQuestion];
-  if (!question) return finishQuiz();
-
-  quizAnswered = false;
-
-  const progress = ((currentQuestion + 1) / currentQuestions.length) * 100;
-  const timerHTML = currentPractice === "timer"
-    ? `<span class="timer-display" id="timerDisplay">${remainingTime}s</span>`
-    : "";
-
-  document.getElementById("quizContent").innerHTML = `
-    <button class="back-button" onclick="closeQuiz()">← Exit Quiz</button>
-
-    <div class="quiz-card">
-      <div class="quiz-top">
-        <span>${currentPractice.toUpperCase()} MODE</span>
-        ${timerHTML}
-      </div>
-
-      <div class="quiz-progress">
-        <div style="width:${progress}%"></div>
-      </div>
-
-      <p class="question-count">Question ${currentQuestion + 1} of ${currentQuestions.length}</p>
-      <h2 class="question-title">${formatText(question.question)}</h2>
-
-      <div class="option-list">
-        ${(question.options || []).map((option, index) => `
-          <button class="quiz-option" onclick="checkAnswer(${index})">
-            <span>${String.fromCharCode(65 + index)}</span>
-            ${formatText(option)}
-          </button>
-        `).join("")}
-      </div>
-
-      <div id="answerFeedback"></div>
-
-      <button id="nextQuestionButton" class="primary-button next-button"
-        onclick="nextQuestion()" disabled>
-        Next Question →
-      </button>
-    </div>
-  `;
-}
-
-function checkAnswer(selected) {
-  if (quizAnswered || quizFinished) return;
-
-  quizAnswered = true;
-
-  const question = currentQuestions[currentQuestion];
-  const correct = Number(question.answer);
-  const options = document.querySelectorAll(".quiz-option");
-
-  options.forEach((option, index) => {
-    option.disabled = true;
-
-    if (index === correct) option.classList.add("correct");
-    if (index === selected && index !== correct) {
-      option.classList.add("wrong");
-    }
-  });
-
-  const isCorrect = selected === correct;
-  if (isCorrect) currentScore++;
-
-  const feedback = document.getElementById("answerFeedback");
-  feedback.innerHTML = `
-    <div class="answer-feedback ${isCorrect ? "success" : "error"}">
-      <strong>${isCorrect ? "✓ সঠিক উত্তর!" : "✕ ভুল উত্তর!"}</strong>
-      <p>${formatText(question.explanation || "এই প্রশ্নের অতিরিক্ত ব্যাখ্যা দেওয়া হয়নি।")}</p>
-    </div>
-  `;
-
-  document.getElementById("nextQuestionButton").disabled = false;
-}
-
-function nextQuestion() {
-  if (!quizAnswered) return;
-
-  currentQuestion++;
-
-  if (currentQuestion >= currentQuestions.length) {
-    finishQuiz();
-  } else {
-    renderQuestion();
-  }
-}
-
-function finishQuiz(timeout = false) {
-  if (quizFinished) return;
-
-  quizFinished = true;
-  clearInterval(quizTimer);
-
-  const oldCount = Number(localStorage.getItem(STORAGE.quiz) || 0);
-  const oldScore = Number(localStorage.getItem(STORAGE.score) || 0);
-
-  localStorage.setItem(STORAGE.quiz, oldCount + 1);
-  localStorage.setItem(STORAGE.score, oldScore + currentScore);
-
-  const total = currentQuestions.length;
-  const percentage = total ? Math.round(currentScore / total * 100) : 0;
-
-  document.getElementById("quizContent").innerHTML = `
-    <div class="result-card">
-      <span class="result-icon">${percentage >= 80 ? "🏆" : percentage >= 50 ? "🎯" : "📚"}</span>
-      <h2>${timeout ? "সময় শেষ!" : "Quiz Completed!"}</h2>
-      <div class="result-score">${currentScore}/${total}</div>
-      <h3>${percentage}% Score</h3>
-      <p>${percentage >= 80 ? "অসাধারণ! তোমার প্রস্তুতি ভালো হচ্ছে।" : percentage >= 50 ? "ভালো চেষ্টা! আরও অনুশীলন করো।" : "চিন্তা নেই, আবার পড়ো এবং চেষ্টা করো।"}</p>
-      <button class="primary-button" onclick="showPage('practice')">Practice Again</button>
-      <button class="secondary-button" onclick="closeQuiz()">Back to Learning</button>
-    </div>
-  `;
-
-  updateProgress();
-}
-
-function closeQuiz() {
-  clearInterval(quizTimer);
-  showPage(currentChapter ? "chapterDetails" : "practice");
-}
-
-function resetProgress() {
-  if (!confirm("তোমার সব Progress ও Saved Chapters মুছে ফেলতে চাও?")) return;
-
-  Object.values(STORAGE).forEach(key => localStorage.removeItem(key));
-  updateProgress();
-  renderSaved();
-  alert("Progress reset হয়েছে।");
-}
-
-/* =========================================
-   SEARCH + INITIALIZATION
-========================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-  renderSubjects("subjectList");
-  renderSubjects("allSubjectList");
-  updateProgress();
-  renderSaved();
-
-  const search = document.getElementById("searchInput");
-
-  search.addEventListener("input", () => {
-    const query = search.value.trim().toLowerCase();
-
-    document.querySelectorAll("#subjectList .subject-card").forEach(card => {
-      card.style.display = card.textContent.toLowerCase().includes(query)
-        ? "flex"
-        : "none";
-    });
-  });
-});
-
-/* =========================================
-   SWIPE NAVIGATION
+   EDU VERSE — MAIN APPLICATION
 ========================================= */
 
 (() => {
-  const mainPages = ["home", "subjects", "practice", "saved", "profile"];
-  let startX = 0;
-  let startY = 0;
+  const STORAGE = {
+    saved: "eduVerseSaved",
+    completed: "eduVerseCompleted",
+    quiz: "eduVerseQuizCount",
+    score: "eduVerseQuizScore"
+  };
 
-  document.addEventListener("touchstart", event => {
-    const target = event.target;
+  const subjects = [
+    "বাংলা ১ম পত্র",
+    "বাংলা ২য় পত্র",
+    "ইংরেজি ১ম পত্র",
+    "ইংরেজি ২য় পত্র",
+    "তথ্য ও যোগাযোগ প্রযুক্তি",
+    "পৌরনীতি ১ম পত্র",
+    "পৌরনীতি ২য় পত্র",
+    "অর্থনীতি ১ম পত্র",
+    "অর্থনীতি ২য় পত্র",
+    "ইতিহাস ১ম পত্র",
+    "ইতিহাস ২য় পত্র",
+    "ইসলামের ইতিহাস ১ম পত্র",
+    "ইসলামের ইতিহাস ২য় পত্র",
+    "সমাজবিজ্ঞান ১ম পত্র",
+    "সমাজবিজ্ঞান ২য় পত্র",
+    "যুক্তিবিদ্যা ১ম পত্র",
+    "যুক্তিবিদ্যা ২য় পত্র",
+    "ভূগোল ১ম পত্র",
+    "ভূগোল ২য় পত্র"
+  ];
 
-    if (target.closest("button, input, textarea, select, a, details")) {
-      startX = 0;
+  const icons = ["📘", "📗", "📙", "📕"];
+
+  let currentChapter = null;
+  let currentPractice = "mcq";
+  let questions = [];
+  let questionIndex = 0;
+  let score = 0;
+  let answered = false;
+  let timerInterval = null;
+  let remainingTime = 60;
+  let quizFinished = false;
+
+  function readStorage(key, fallback) {
+    try {
+      const value = localStorage.getItem(key);
+      return value ? JSON.parse(value) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function writeStorage(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.warn("Storage unavailable:", error);
+    }
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    })[char]);
+  }
+
+  function getSaved() {
+    return readStorage(STORAGE.saved, []);
+  }
+
+  function getCompleted() {
+    return readStorage(STORAGE.completed, []);
+  }
+
+  function getQuizCount() {
+    return Number(readStorage(STORAGE.quiz, 0)) || 0;
+  }
+
+  function getChapterDatabase() {
+    return window.EDU_VERSE_CHAPTERS || {};
+  }
+
+  function getBanglaChapter() {
+    const database = getChapterDatabase();
+    return database["অপরিচিতা"] || null;
+  }
+
+  function getChapterKey(chapter) {
+    return chapter?.id || chapter?.title || "unknown";
+  }
+
+  function getQuestionBank() {
+    const chapter = getBanglaChapter();
+    return Array.isArray(chapter?.mcq) ? chapter.mcq : [];
+  }
+
+  /* PAGE NAVIGATION */
+
+  function updateNavigation(pageName) {
+    document.querySelectorAll(".nav-item").forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.page === pageName
+      );
+    });
+  }
+
+  function showPage(pageName, clickedButton) {
+    const pages = document.querySelectorAll(".container > .page");
+
+    pages.forEach(page => page.classList.remove("active"));
+
+    const target = document.getElementById(pageName + "Page");
+
+    if (target) {
+      target.classList.add("active");
+    }
+
+    const navPage = ["home", "subjects", "practice", "saved", "profile"]
+      .includes(pageName) ? pageName : null;
+
+    if (navPage) {
+      updateNavigation(navPage);
+    }
+
+    if (pageName === "saved") renderSaved();
+    if (pageName === "profile") updateProgress();
+
+    if (clickedButton?.dataset?.page) {
+      updateNavigation(clickedButton.dataset.page);
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* SUBJECTS */
+
+  function createSubjectCard(subject, index) {
+    return `
+      <button class="subject-card"
+        onclick="openPaper('${escapeHTML(subject)}')">
+        <span class="subject-icon">${icons[index % icons.length]}</span>
+        <span>${escapeHTML(subject)}</span>
+        <span class="subject-arrow">→</span>
+      </button>
+    `;
+  }
+
+  function renderSubjects(filter = "") {
+    const homeList = document.getElementById("subjectList");
+    const allList = document.getElementById("allSubjectList");
+
+    const filtered = subjects.filter(subject =>
+      subject.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    const html = filtered.length
+      ? filtered.map(createSubjectCard).join("")
+      : `<div class="empty-state">
+          <h3>কোনো বিষয় পাওয়া যায়নি</h3>
+          <p>অন্য নামে খুঁজে দেখো।</p>
+        </div>`;
+
+    if (homeList) homeList.innerHTML = html;
+    if (allList) allList.innerHTML = subjects.map(createSubjectCard).join("");
+  }
+
+  function openPaper(name) {
+    currentChapter = null;
+
+    const title = document.getElementById("paperTitle");
+    const list = document.getElementById("chapterList");
+
+    if (title) title.textContent = name;
+
+    const isBanglaFirst =
+      name.includes("বাংলা") &&
+      (name.includes("১ম") || name.includes("প্রথম"));
+
+    if (isBanglaFirst) {
+      const chapter = getBanglaChapter();
+
+      if (chapter) {
+        list.innerHTML = `
+          <button class="chapter-item"
+            onclick="openChapterDetails('অপরিচিতা')">
+            <span class="chapter-number">01</span>
+            <span class="chapter-info">
+              <h3>${escapeHTML(chapter.title)}</h3>
+              <p>${escapeHTML(chapter.author)} · ${escapeHTML(chapter.type || "গদ্য")}</p>
+              <span class="content-status">✓ Complete Study Pack</span>
+            </span>
+            <span class="subject-arrow">→</span>
+          </button>
+          <div class="coming-soon">
+            <h3>আরও অধ্যায় আসছে</h3>
+            <p>বাংলা ১ম পত্রের পরবর্তী অধ্যায়গুলো পর্যায়ক্রমে যুক্ত করা হবে।</p>
+          </div>
+        `;
+      } else {
+        list.innerHTML = `
+          <div class="empty-state">
+            <h3>অধ্যায়ের ডেটা পাওয়া যায়নি</h3>
+            <p>chapters/bangla-1st.js ফাইলটি সঠিকভাবে লোড হয়েছে কি না দেখো।</p>
+          </div>
+        `;
+      }
+    } else {
+      list.innerHTML = `
+        <div class="coming-soon">
+          <h3>এই বিষয়ের অধ্যায় প্রস্তুত হচ্ছে</h3>
+          <p>এই বিষয়ের বিস্তারিত অধ্যায় ও অনুশীলন শীঘ্রই যুক্ত হবে।</p>
+        </div>
+      `;
+    }
+
+    showPage("chapter");
+  }
+
+  /* CHAPTER DETAILS */
+
+  function textBlock(title, content) {
+    if (!content) return "";
+
+    return `
+      <section class="study-section">
+        <h3>${title}</h3>
+        <div class="section-content">${escapeHTML(content)}</div>
+      </section>
+    `;
+  }
+
+  function renderArrayItems(items, type) {
+    if (!Array.isArray(items) || !items.length) return "";
+
+    if (type === "discussion" || type === "explanations") {
+      return items.map(item => `
+        <div class="discussion-item">
+          <h4>${escapeHTML(item.heading || "")}</h4>
+          <p>${escapeHTML(item.details || item.description || "")}</p>
+        </div>
+      `).join("");
+    }
+
+    if (type === "characters") {
+      return items.map(item => `
+        <div class="character-item">
+          <h4>${escapeHTML(item.name || "")}</h4>
+          <p>${escapeHTML(item.description || "")}</p>
+        </div>
+      `).join("");
+    }
+
+    if (type === "vocabulary") {
+      return items.map(item => `
+        <div class="vocabulary-item">
+          <strong>${escapeHTML(item.word || "")}</strong>
+          <span>${escapeHTML(item.meaning || "")}</span>
+        </div>
+      `).join("");
+    }
+
+    return "";
+  }
+
+  function renderCQ(items) {
+    if (!Array.isArray(items)) return "";
+
+    return items.map((item, index) => {
+      const sub = item.subQuestions || {};
+
+      return `
+        <article class="cq-card">
+          <h4>সৃজনশীল প্রশ্ন ${index + 1}</h4>
+
+          <div class="stimulus">
+            <strong>উদ্দীপক:</strong>
+            <p>${escapeHTML(item.stimulus || "")}</p>
+          </div>
+
+          <p>${escapeHTML(item.question || "")}</p>
+
+          <div class="cq-subquestions">
+            <p><b>ক.</b> ${escapeHTML(sub.a || "")}</p>
+            <p><b>খ.</b> ${escapeHTML(sub.b || "")}</p>
+            <p><b>গ.</b> ${escapeHTML(sub.c || "")}</p>
+            <p><b>ঘ.</b> ${escapeHTML(sub.d || "")}</p>
+          </div>
+
+          ${
+            Array.isArray(item.guidance)
+              ? `<details>
+                  <summary>উত্তর লেখার নির্দেশনা দেখো</summary>
+                  ${item.guidance.map((tip, i) =>
+                    `<p>${i + 1}. ${escapeHTML(tip)}</p>`
+                  ).join("")}
+                </details>`
+              : ""
+          }
+        </article>
+      `;
+    }).join("");
+  }
+
+  function renderRevision(items) {
+    if (!Array.isArray(items)) return "";
+
+    return items.map((item, index) => `
+      <details class="revision-item">
+        <summary>${index + 1}. ${escapeHTML(item.question || "")}</summary>
+        <p>${escapeHTML(item.answer || "")}</p>
+      </details>
+    `).join("");
+  }
+
+  function openChapterDetails(title) {
+    const database = getChapterDatabase();
+    const chapter = database[title];
+
+    if (!chapter) {
+      alert("এই অধ্যায়ের তথ্য পাওয়া যায়নি।");
       return;
     }
 
-    startX = event.touches[0].clientX;
-    startY = event.touches[0].clientY;
-  }, { passive: true });
+    currentChapter = chapter;
 
-  document.addEventListener("touchend", event => {
-    if (!startX) return;
+    const key = getChapterKey(chapter);
+    const saved = getSaved().includes(key);
+    const completed = getCompleted().includes(key);
 
-    const dx = event.changedTouches[0].clientX - startX;
-    const dy = event.changedTouches[0].clientY - startY;
+    const intro = chapter.introduction || chapter.intro || "";
+    const author = chapter.authorInfo || "";
+    const summary = chapter.summary || "";
+    const theme = chapter.theme || "";
 
-    startX = 0;
+    const discussion = chapter.discussion;
+    const discussionHTML = Array.isArray(discussion)
+      ? renderArrayItems(discussion, "discussion")
+      : escapeHTML(discussion || "");
 
-    if (Math.abs(dx) < 90 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+    const words = chapter.vocabulary || chapter.words || [];
 
-    const active = document.querySelector(".page.active");
-    if (!active) return;
+    const details = document.getElementById("chapterDetails");
 
-    const current = mainPages.indexOf(active.id.replace("Page", ""));
-    if (current === -1) return;
+    details.innerHTML = `
+      <button class="back-button" onclick="showPage('chapter')">
+        ← Back to Chapters
+      </button>
 
-    const next = dx < 0 ? current + 1 : current - 1;
-    if (next < 0 || next >= mainPages.length) return;
+      <div class="chapter-hero">
+        <span class="eyebrow">${escapeHTML(chapter.paper || "বাংলা ১ম পত্র")}</span>
+        <h2>${escapeHTML(chapter.title)}</h2>
+        <p>${escapeHTML(chapter.author || "")} · ${escapeHTML(chapter.type || "অধ্যায়")}</p>
 
-    showPage(mainPages[next]);
-  }, { passive: true });
+        <div class="chapter-actions">
+          <button class="secondary-button" onclick="toggleSaveCurrent()">
+            ${saved ? "🔖 Saved" : "＋ Save Chapter"}
+          </button>
+          <button class="secondary-button" onclick="toggleCompletedCurrent()">
+            ${completed ? "✓ Completed" : "Mark Completed"}
+          </button>
+          <button class="primary-button" onclick="startChapterPractice()">
+            🎯 Practice MCQ
+          </button>
+        </div>
+      </div>
+
+      ${textBlock("পাঠ পরিচিতি", intro)}
+      ${textBlock("লেখক পরিচিতি", author)}
+      ${textBlock("মূলভাব ও সারসংক্ষেপ", summary)}
+      ${textBlock("মূলভাব / বিষয়বস্তু", theme)}
+
+      ${
+        chapter.characters?.length
+          ? `<section class="study-section">
+              <h3>চরিত্র পরিচিতি</h3>
+              ${renderArrayItems(chapter.characters, "characters")}
+            </section>`
+          : ""
+      }
+
+      ${
+        discussionHTML
+          ? `<section class="study-section">
+              <h3>বিস্তারিত আলোচনা</h3>
+              ${discussionHTML}
+            </section>`
+          : ""
+      }
+
+      ${
+        words.length
+          ? `<section class="study-section">
+              <h3>শব্দার্থ</h3>
+              <div class="vocabulary-list">
+                ${renderArrayItems(words, "vocabulary")}
+              </div>
+            </section>`
+          : ""
+      }
+
+      ${
+        chapter.explanations?.length
+          ? `<section class="study-section">
+              <h3>গুরুত্বপূর্ণ ব্যাখ্যা</h3>
+              ${renderArrayItems(chapter.explanations, "explanations")}
+            </section>`
+          : ""
+      }
+
+      ${
+        chapter.mcq?.length
+          ? `<section class="study-section">
+              <h3>MCQ প্রশ্নব্যাংক (${chapter.mcq.length}টি)</h3>
+              <p class="section-content">
+                সব প্রশ্নের অনুশীলনের জন্য MCQ Practice শুরু করো।
+              </p>
+              <button class="primary-button" onclick="startChapterPractice()">
+                Start ${chapter.mcq.length} MCQ →
+              </button>
+            </section>`
+          : ""
+      }
+
+      ${
+        chapter.cq?.length
+          ? `<section class="study-section">
+              <h3>সৃজনশীল প্রশ্ন (${chapter.cq.length}টি)</h3>
+              ${renderCQ(chapter.cq)}
+            </section>`
+          : ""
+      }
+
+      ${
+        chapter.revision?.length
+          ? `<section class="study-section">
+              <h3>Revision — নিজেকে যাচাই করো</h3>
+              ${renderRevision(chapter.revision)}
+            </section>`
+          : ""
+      }
+
+      ${
+        chapter.studyTips?.length
+          ? `<section class="study-section">
+              <h3>পরীক্ষার প্রস্তুতি টিপস</h3>
+              <ul class="tips-list">
+                ${chapter.studyTips.map(tip =>
+                  `<li>${escapeHTML(tip)}</li>`
+                ).join("")}
+              </ul>
+            </section>`
+          : ""
+      }
+
+      ${
+        chapter.sourceInfo
+          ? `<section class="study-section">
+              <h3>তথ্যসূত্র ও নোট</h3>
+              <p class="section-content">
+                ${escapeHTML(chapter.sourceInfo.note || "")}
+              </p>
+              <p class="section-content">
+                ${escapeHTML(chapter.sourceInfo.syllabusNote || "")}
+              </p>
+            </section>`
+          : ""
+      }
+    `;
+
+    showPage("chapterDetails");
+  }
+
+  /* SAVE AND COMPLETED */
+
+  function toggleSaveCurrent() {
+    if (!currentChapter) return;
+
+    const key = getChapterKey(currentChapter);
+    let saved = getSaved();
+
+    saved = saved.includes(key)
+      ? saved.filter(item => item !== key)
+      : [...saved, key];
+
+    writeStorage(STORAGE.saved, saved);
+
+    openChapterDetails(currentChapter.title);
+    updateProgress();
+  }
+
+  function toggleCompletedCurrent() {
+    if (!currentChapter) return;
+
+    const key = getChapterKey(currentChapter);
+    let completed = getCompleted();
+
+    completed = completed.includes(key)
+      ? completed.filter(item => item !== key)
+      : [...completed, key];
+
+    writeStorage(STORAGE.completed, completed);
+
+    openChapterDetails(currentChapter.title);
+    updateProgress();
+  }
+
+  function renderSaved() {
+    const list = document.getElementById("savedList");
+    if (!list) return;
+
+    const saved = getSaved();
+    const database = getChapterDatabase();
+
+    const chapters = Object.values(database).filter(chapter =>
+      saved.includes(getChapterKey(chapter))
+    );
+
+    if (!chapters.length) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <h3>এখনো কিছু Save করা হয়নি</h3>
+          <p>অধ্যায় থেকে Save Chapter চাপলে এখানে পাবে।</p>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = chapters.map(chapter => `
+      <button class="chapter-item"
+        onclick="openChapterDetails('${escapeHTML(chapter.title)}')">
+        <span class="chapter-number">📘</span>
+        <span class="chapter-info">
+          <h3>${escapeHTML(chapter.title)}</h3>
+          <p>${escapeHTML(chapter.author || "")}</p>
+          <span class="content-status">Saved Chapter</span>
+        </span>
+        <span class="subject-arrow">→</span>
+      </button>
+    `).join("");
+  }
+
+  /* QUESTION HELPERS */
+
+  function shuffle(array) {
+    const result = [...array];
+
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+
+    return result;
+  }
+
+  function normalizeQuestion(question) {
+    return {
+      question: question.question || "",
+      options: Array.isArray(question.options) ? question.options : [],
+      answer: Number(question.answer),
+      explanation: question.explanation || "এই প্রশ্নের অতিরিক্ত ব্যাখ্যা দেওয়া হয়নি।"
+    };
+  }
+
+  function startPractice(mode = "mcq") {
+    const bank = getQuestionBank();
+
+    if (!bank.length) {
+      alert("এখনো কোনো অধ্যায়ের MCQ পাওয়া যায়নি।");
+      return;
+    }
+
+    currentPractice = mode;
+    quizFinished = false;
+    questionIndex = 0;
+    score = 0;
+    answered = false;
+
+    const shuffled = shuffle(bank).map(normalizeQuestion);
+
+    if (mode === "quick") {
+      questions = shuffled.slice(0, 5);
+    } else if (mode === "timer") {
+      questions = shuffled.slice(0, 15);
+      remainingTime = 60;
+    } else {
+      questions = shuffled;
+    }
+
+    if (!questions.length) {
+      alert("প্রশ্ন পাওয়া যায়নি।");
+      return;
+    }
+
+    clearInterval(timerInterval);
+    showPage("quiz");
+
+    renderQuestion();
+
+    if (mode === "timer") {
+      startTimer();
+    }
+  }
+
+  function startChapterPractice() {
+    startPractice("mcq");
+  }
+
+  /* TIMER */
+
+  function startTimer() {
+    updateTimerDisplay();
+
+    timerInterval = setInterval(() => {
+      if (quizFinished) {
+        clearInterval(timerInterval);
+        return;
+      }
+
+      remainingTime--;
+      updateTimerDisplay();
+
+      if (remainingTime <= 0) {
+        finishQuiz(true);
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    const timer = document.getElementById("timerDisplay");
+    if (!timer) return;
+
+    const minutes = Math.floor(remainingTime / 60);
+    const seconds = remainingTime % 60;
+
+    timer.textContent =
+      `${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+  }
+
+  /* QUIZ RENDERING */
+
+  function renderQuestion() {
+    const question = questions[questionIndex];
+    const content = document.getElementById("quizContent");
+
+    if (!question || !content) return;
+
+    answered = false;
+
+    const progress = ((questionIndex + 1) / questions.length) * 100;
+
+    content.innerHTML = `
+      <button class="back-button" onclick="closeQuiz()">← Exit Quiz</button>
+
+      <div class="quiz-card">
+        <div class="quiz-top">
+          <span>${currentPractice.toUpperCase()} MODE</span>
+          ${
+            currentPractice === "timer"
+              ? `<span class="timer-display" id="timerDisplay">01:00</span>`
+              : `<span>Score: ${score}</span>`
+          }
+        </div>
+
+        <div class="quiz-progress">
+          <div style="width:${progress}%"></div>
+        </div>
+
+        <p class="question-count">
+          Question ${questionIndex + 1} of ${questions.length}
+        </p>
+
+        <h3 class="question-title">${escapeHTML(question.question)}</h3>
+
+        <div class="option-list">
+          ${question.options.map((option,index) => `
+            <button class="quiz-option" onclick="checkAnswer(${index})">
+              <span>${String.fromCharCode(65 + index)}</span>
+              ${escapeHTML(option)}
+            </button>
+          `).join("")}
+        </div>
+
+        <div id="answerFeedback"></div>
+
+        <button
+          id="nextQuestionButton"
+          class="primary-button next-button"
+          onclick="nextQuestion()"
+          disabled>
+          ${questionIndex === questions.length - 1 ? "See Result →" : "Next Question →"}
+        </button>
+      </div>
+    `;
+
+    updateTimerDisplay();
+  }
+
+  function checkAnswer(selected) {
+    if (answered || quizFinished) return;
+
+    const question = questions[questionIndex];
+    if (!question) return;
+
+    answered = true;
+
+    const correct = selected === question.answer;
+
+    if (correct) score++;
+
+    const options = document.querySelectorAll(".quiz-option");
+
+    options.forEach((button,index) => {
+      button.disabled = true;
+
+      if (index === question.answer) {
+        button.classList.add("correct");
+      }
+
+      if (index === selected && !correct) {
+        button.classList.add("wrong");
+      }
+    });
+
+    const feedback = document.getElementById("answerFeedback");
+
+    feedback.innerHTML = `
+      <div class="answer-feedback ${correct ? "success" : "error"}">
+        <strong>${correct ? "✓ সঠিক উত্তর!" : "✕ ভুল উত্তর!"}</strong>
+        <p><b>সঠিক উত্তর:</b> ${escapeHTML(question.options[question.answer] ?? "")}</p>
+        <p><b>ব্যাখ্যা:</b> ${escapeHTML(question.explanation)}</p>
+      </div>
+    `;
+
+    const nextButton = document.getElementById("nextQuestionButton");
+    if (nextButton) nextButton.disabled = false;
+  }
+
+  function nextQuestion() {
+    if (!answered || quizFinished) return;
+
+    questionIndex++;
+
+    if (questionIndex >= questions.length) {
+      finishQuiz(false);
+    } else {
+      renderQuestion();
+    }
+  }
+
+  function finishQuiz(timeUp = false) {
+    if (quizFinished) return;
+
+    quizFinished = true;
+    clearInterval(timerInterval);
+
+    const count = getQuizCount() + 1;
+    const totalScore = Number(readStorage(STORAGE.score, 0)) + score;
+
+    writeStorage(STORAGE.quiz, count);
+    writeStorage(STORAGE.score, totalScore);
+
+    const content = document.getElementById("quizContent");
+    const percentage = Math.round((score / questions.length) * 100);
+
+    content.innerHTML = `
+      <div class="result-card">
+        <div class="result-icon">${percentage >= 70 ? "🏆" : "📚"}</div>
+        <h2>${timeUp ? "সময় শেষ!" : "Quiz Completed!"}</h2>
+        <div class="result-score">${score}/${questions.length}</div>
+        <h3>${percentage}% Correct</h3>
+        <p>
+          ${
+            percentage >= 80
+              ? "অসাধারণ! তোমার প্রস্তুতি খুব ভালো।"
+              : percentage >= 50
+                ? "ভালো চেষ্টা! আরও অনুশীলন করো।"
+                : "হাল ছেড়ো না। অধ্যায়টি আবার পড়ো এবং চেষ্টা করো।"
+          }
+        </p>
+
+        <button class="primary-button" onclick="startPractice('${currentPractice}')">
+          Try Again →
+        </button>
+
+        <button class="secondary-button" onclick="showPage('practice')">
+          Practice Zone
+        </button>
+
+        <button class="secondary-button" onclick="showPage('home')">
+          Home
+        </button>
+      </div>
+    `;
+
+    updateProgress();
+  }
+
+  function closeQuiz() {
+    clearInterval(timerInterval);
+    quizFinished = true;
+    showPage("practice");
+  }
+
+  /* PROGRESS */
+
+  function updateProgress() {
+    const completed = getCompleted().length;
+    const saved = getSaved().length;
+    const quizzes = getQuizCount();
+
+    const values = {
+      completedCount: completed,
+      completedCountHome: completed,
+      savedCount: saved,
+      quizCount: quizzes,
+      quizCountHome: quizzes
+    };
+
+    Object.entries(values).forEach(([id,value]) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value;
+    });
+  }
+
+  function resetProgress() {
+    if (!confirm("তুমি কি সত্যিই সব Progress Reset করতে চাও?")) {
+      return;
+    }
+
+    localStorage.removeItem(STORAGE.saved);
+    localStorage.removeItem(STORAGE.completed);
+    localStorage.removeItem(STORAGE.quiz);
+    localStorage.removeItem(STORAGE.score);
+
+    renderSaved();
+    updateProgress();
+    alert("Progress Reset হয়েছে।");
+  }
+
+  /* SWIPE NAVIGATION */
+
+  function setupSwipe() {
+    const pages = ["home","subjects","practice","saved","profile"];
+    let startX = 0;
+    let startY = 0;
+
+    document.addEventListener("touchstart", event => {
+      const touch = event.changedTouches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+    }, { passive: true });
+
+    document.addEventListener("touchend", event => {
+      const target = event.target;
+
+      if (target.closest("button,input,textarea,select,a,details")) return;
+
+      if (
+        document.getElementById("chapterDetailsPage").classList.contains("active") ||
+        document.getElementById("quizPage").classList.contains("active")
+      ) return;
+
+      const dx = event.changedTouches[0].clientX - startX;
+      const dy = event.changedTouches[0].clientY - startY;
+
+      if (Math.abs(dx) < 90 || Math.abs(dx) < Math.abs(dy)) return;
+
+      const active = document.querySelector(".nav-item.active");
+      const current = active?.dataset.page || "home";
+      const index = pages.indexOf(current);
+
+      if (dx < 0 && index < pages.length - 1) {
+        showPage(pages[index + 1]);
+      } else if (dx > 0 && index > 0) {
+        showPage(pages[index - 1]);
+      }
+    }, { passive: true });
+  }
+
+  /* INITIALIZATION */
+
+  function init() {
+    renderSubjects();
+
+    const search = document.getElementById("searchInput");
+
+    if (search) {
+      search.addEventListener("input", event => {
+        const homeList = document.getElementById("subjectList");
+        const filtered = subjects.filter(subject =>
+          subject.toLowerCase().includes(event.target.value.toLowerCase())
+        );
+
+        homeList.innerHTML = filtered.length
+          ? filtered.map(createSubjectCard).join("")
+          : `<div class="empty-state"><h3>কোনো বিষয় পাওয়া যায়নি</h3></div>`;
+      });
+    }
+
+    updateProgress();
+    renderSaved();
+    setupSwipe();
+
+    if (!getBanglaChapter()) {
+      console.error("অপরিচিতা অধ্যায়ের ডেটা পাওয়া যায়নি।");
+    }
+  }
+
+  /* GLOBAL FUNCTIONS FOR HTML BUTTONS */
+
+  window.showPage = showPage;
+  window.openPaper = openPaper;
+  window.openChapterDetails = openChapterDetails;
+  window.startPractice = startPractice;
+  window.startChapterPractice = startChapterPractice;
+  window.toggleSaveCurrent = toggleSaveCurrent;
+  window.toggleCompletedCurrent = toggleCompletedCurrent;
+  window.checkAnswer = checkAnswer;
+  window.nextQuestion = nextQuestion;
+  window.closeQuiz = closeQuiz;
+  window.resetProgress = resetProgress;
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();
