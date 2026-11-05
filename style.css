@@ -1,6 +1,7 @@
 
 /* =========================================
    EDU VERSE — PREMIUM EMERALD GOLD UI
+   Responsive • Dark/Light Mode
    Animated Network • Glassmorphism
 ========================================= */
 
@@ -37,9 +38,13 @@ body {
   color: var(--text);
   font-family: system-ui, "Noto Sans Bengali", sans-serif;
   overflow-x: hidden;
+  transition: background .25s ease, color .25s ease;
 }
 
-button, input {
+button,
+input,
+select,
+textarea {
   font: inherit;
 }
 
@@ -48,7 +53,9 @@ button {
   color: inherit;
 }
 
-/* BACKGROUND */
+/* =========================================
+   BACKGROUND
+========================================= */
 
 .aurora-background {
   position: fixed;
@@ -59,6 +66,7 @@ button {
   background:
     radial-gradient(ellipse at 50% 15%, #073d2d 0%, transparent 65%),
     linear-gradient(145deg, #04110e, #071c15, #06130f);
+  transition: background .3s ease;
 }
 
 #networkBackground {
@@ -97,11 +105,17 @@ button {
 }
 
 @keyframes auroraMove {
-  from { transform: translate(0, 0) scale(1); }
-  to { transform: translate(80px, 60px) scale(1.25); }
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(80px, 60px) scale(1.25);
+  }
 }
 
-/* APP LAYOUT */
+/* =========================================
+   APP LAYOUT
+========================================= */
 
 .header,
 .container,
@@ -117,12 +131,101 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 5%;
-  background: rgba(7, 21, 18, .86);
+  gap: 12px;
+  min-height: 72px;
+  padding: 10px 16px;
+  background: rgba(7, 21, 18, .90);
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
+
+/* Header Profile */
+
+.header-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  overflow: hidden;
+}
+
+.header-avatar {
+  display: block;
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  max-width: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid var(--border);
+}
+
+.header-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.header-user-info strong {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 750;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-user-info small {
+  color: var(--muted);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Header Tools */
+
+.header-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.header-tool {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 17px;
+  transition: .2s ease;
+}
+
+.header-tool:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+/* Old Brand Support */
 
 .brand {
   display: flex;
@@ -180,11 +283,19 @@ button {
 }
 
 @keyframes pageEnter {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* HERO */
+/* =========================================
+   HERO
+========================================= */
 
 .hero {
   position: relative;
@@ -192,9 +303,14 @@ button {
   padding: clamp(25px, 6vw, 55px);
   border: 1px solid var(--border);
   border-radius: 28px;
-  background: linear-gradient(130deg, rgba(21, 54, 40, .92), rgba(11, 30, 23, .82));
+  background: linear-gradient(
+    130deg,
+    rgba(21, 54, 40, .92),
+    rgba(11, 30, 23, .82)
+  );
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .hero::after {
@@ -209,8 +325,12 @@ button {
 }
 
 @keyframes heroFloat {
-  from { transform: translateY(0) rotate(0deg); }
-  to { transform: translateY(-18px) rotate(15deg); }
+  from {
+    transform: translateY(0) rotate(0deg);
+  }
+  to {
+    transform: translateY(-18px) rotate(15deg);
+  }
 }
 
 .eyebrow {
@@ -267,7 +387,9 @@ button {
   color: var(--gold);
 }
 
-/* STATS */
+/* =========================================
+   STATS
+========================================= */
 
 .stats-grid {
   display: grid;
@@ -297,12 +419,15 @@ button {
   font-size: 12px;
 }
 
-/* SECTION HEADINGS */
+/* =========================================
+   SECTION HEADINGS
+========================================= */
 
 .section-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
   margin: 28px 0 16px;
 }
 
@@ -324,12 +449,14 @@ button {
   margin: 10px 0;
 }
 
-/* QUICK ACCESS */
+/* =========================================
+   QUICK ACCESS
+========================================= */
 
 .quick-grid,
 .practice-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -371,7 +498,9 @@ button {
   border-color: var(--gold);
 }
 
-/* SEARCH */
+/* =========================================
+   SEARCH
+========================================= */
 
 .search-input {
   width: 100%;
@@ -388,7 +517,30 @@ button {
   border-color: var(--gold);
 }
 
-/* SUBJECTS */
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+input:not([type="file"]),
+select,
+textarea {
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+select option {
+  background: var(--bg2);
+  color: var(--text);
+}
+
+/* =========================================
+   SUBJECTS
+========================================= */
 
 .subject-list,
 .chapter-list {
@@ -414,7 +566,9 @@ button {
   color: var(--gold);
 }
 
-/* CHAPTER LIST */
+/* =========================================
+   CHAPTER LIST
+========================================= */
 
 .chapter-item {
   display: flex;
@@ -427,6 +581,7 @@ button {
 .chapter-number {
   width: 43px;
   height: 43px;
+  min-width: 43px;
   display: grid;
   place-items: center;
   border-radius: 13px;
@@ -437,6 +592,7 @@ button {
 
 .chapter-info {
   flex: 1;
+  min-width: 0;
 }
 
 .chapter-info h3 {
@@ -472,7 +628,9 @@ button {
   line-height: 1.8;
 }
 
-/* PRACTICE */
+/* =========================================
+   PRACTICE
+========================================= */
 
 .practice-card {
   padding: 25px;
@@ -500,7 +658,9 @@ button {
   font-size: 12px;
 }
 
-/* PROFILE */
+/* =========================================
+   PROFILE
+========================================= */
 
 .profile-card {
   padding: 30px;
@@ -511,19 +671,54 @@ button {
   background: var(--card);
 }
 
+/* Profile image: fixed size */
+
 .profile-avatar {
-  font-size: 48px;
+  display: block;
+  width: 110px !important;
+  height: 110px !important;
+  min-width: 110px;
+  max-width: 110px;
+  min-height: 110px;
+  max-height: 110px;
+  margin: 0 auto;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+  font-size: 0;
 }
 
 .profile-card h3 {
   margin: 10px;
+  color: var(--text);
 }
 
 .profile-card p {
   color: var(--muted);
 }
 
-/* CHAPTER STUDY PACK */
+#profileImageInput {
+  display: block;
+  max-width: 100%;
+  margin: 15px auto;
+  font-size: 12px;
+}
+
+#studentProfileForm {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
+#studentProfileForm input,
+#studentProfileForm select,
+#studentProfileForm textarea {
+  width: 100%;
+}
+
+/* =========================================
+   CHAPTER STUDY PACK
+========================================= */
 
 .chapter-hero {
   padding: 25px;
@@ -666,7 +861,9 @@ button {
   line-height: 2.2;
 }
 
-/* QUIZ */
+/* =========================================
+   QUIZ
+========================================= */
 
 .quiz-card {
   padding: clamp(18px, 4vw, 30px);
@@ -678,6 +875,7 @@ button {
 .quiz-top {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
   color: var(--gold);
   font-size: 12px;
   font-weight: 800;
@@ -810,7 +1008,18 @@ button {
   line-height: 1.8;
 }
 
-/* BOTTOM NAV */
+/* =========================================
+   SAVED NOTES
+========================================= */
+
+#savedList {
+  display: grid;
+  gap: 12px;
+}
+
+/* =========================================
+   BOTTOM NAVIGATION
+========================================= */
 
 .bottom-nav {
   position: fixed;
@@ -820,9 +1029,10 @@ button {
   left: 0;
   display: flex;
   justify-content: space-around;
+  align-items: center;
   padding: 10px 5px calc(10px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--border);
-  background: rgba(7, 21, 18, .94);
+  background: rgba(7, 21, 18, .96);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
@@ -831,6 +1041,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   min-width: 52px;
   padding: 5px;
@@ -838,6 +1049,7 @@ button {
   background: transparent;
   color: var(--muted);
   font-size: 21px;
+  transition: .2s ease;
 }
 
 .nav-item small {
@@ -848,28 +1060,209 @@ button {
   color: var(--gold);
 }
 
-/* FOCUS */
+.nav-item:active {
+  transform: scale(.94);
+}
+
+/* =========================================
+   DARK / LIGHT MODE
+========================================= */
+
+/* Light Theme Variables */
+
+body.light-mode {
+  --bg: #f2f6f2;
+  --bg2: #e6eee8;
+  --card: rgba(255, 255, 255, .94);
+  --card2: #edf3ee;
+  --gold: #9a6a16;
+  --gold2: #a87920;
+  --green: #168b5b;
+  --text: #183126;
+  --muted: #64776c;
+  --danger: #dc4545;
+  --border: rgba(100, 125, 105, .25);
+  --shadow: 0 12px 35px rgba(25, 55, 35, .09);
+}
+
+/* Light Body */
+
+body.light-mode {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Light Background */
+
+body.light-mode .aurora-background {
+  background:
+    radial-gradient(ellipse at 50% 15%, #e1f3e7 0%, transparent 65%),
+    linear-gradient(145deg, #f7faf7, #eaf2ec, #f4f7f3);
+}
+
+body.light-mode #networkBackground {
+  opacity: .20;
+}
+
+/* Light Header */
+
+body.light-mode .header {
+  background: rgba(247, 250, 247, .94);
+}
+
+body.light-mode .bottom-nav {
+  background: rgba(247, 250, 247, .97);
+}
+
+body.light-mode .header-user-info strong {
+  color: var(--text);
+}
+
+/* Light Cards */
+
+body.light-mode .hero {
+  background: linear-gradient(130deg, #ffffff, #e9f3eb);
+}
+
+body.light-mode .stat-card,
+body.light-mode .quick-card,
+body.light-mode .practice-card,
+body.light-mode .subject-card,
+body.light-mode .chapter-item,
+body.light-mode .profile-card,
+body.light-mode .study-section,
+body.light-mode .quiz-card,
+body.light-mode .result-card {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+body.light-mode .chapter-hero {
+  background: linear-gradient(135deg, #e2f1e5, #ffffff);
+}
+
+body.light-mode .coming-soon,
+body.light-mode .empty-state {
+  background: rgba(255, 255, 255, .75);
+}
+
+/* Light Chapter Text */
+
+body.light-mode .section-content,
+body.light-mode .discussion-item p,
+body.light-mode .character-item p,
+body.light-mode .cq-card p,
+body.light-mode .revision-item p,
+body.light-mode .vocabulary-item span,
+body.light-mode .tips-list {
+  color: #354b3d;
+}
+
+body.light-mode .vocabulary-item,
+body.light-mode .cq-card,
+body.light-mode .revision-item,
+body.light-mode .stimulus {
+  background: rgba(35, 100, 55, .055);
+}
+
+/* Light Quiz */
+
+body.light-mode .quiz-option {
+  color: var(--text);
+  background: rgba(255, 255, 255, .85);
+}
+
+body.light-mode .quiz-progress {
+  background: #dce8df;
+}
+
+/* Light Inputs */
+
+body.light-mode .search-input,
+body.light-mode input:not([type="file"]),
+body.light-mode select,
+body.light-mode textarea {
+  color: var(--text);
+  background: #ffffff;
+  border-color: var(--border);
+}
+
+body.light-mode select option {
+  background: #ffffff;
+  color: #183126;
+}
+
+/* Light Buttons */
+
+body.light-mode .secondary-button,
+body.light-mode .back-button,
+body.light-mode .header-tool {
+  color: var(--text);
+  background: #ffffff;
+}
+
+/* =========================================
+   FOCUS
+========================================= */
 
 button:focus-visible,
-input:focus-visible {
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 3px;
 }
 
-/* MOBILE */
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
 
 @media (max-width: 600px) {
+
+  body {
+    padding-bottom: 95px;
+  }
+
+  .header {
+    min-height: 65px;
+    padding: 9px 13px;
+  }
+
+  .header-avatar {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+  }
+
+  .header-user-info strong {
+    font-size: 13px;
+  }
+
+  .header-user-info small {
+    font-size: 10px;
+  }
+
+  .header-tool {
+    width: 37px;
+    height: 37px;
+    font-size: 15px;
+  }
+
   .container {
     width: 92%;
     margin: 20px auto;
   }
 
-  .header {
-    padding: 12px 4%;
-  }
-
   .hero {
     padding: 25px 20px;
+  }
+
+  .hero h2 {
+    font-size: clamp(28px, 8vw, 38px);
   }
 
   .stats-grid {
@@ -919,14 +1312,114 @@ input:focus-visible {
     font-size: 17px;
   }
 
+  .profile-card {
+    padding: 22px 16px;
+  }
+
+  .profile-avatar {
+    width: 100px !important;
+    height: 100px !important;
+    min-width: 100px;
+    max-width: 100px;
+    min-height: 100px;
+    max-height: 100px;
+  }
+
+  .bottom-nav {
+    padding-top: 9px;
+  }
+
+  .nav-item {
+    min-width: 48px;
+    font-size: 20px;
+  }
+
+  .nav-item small {
+    font-size: 10px;
+  }
+
   #networkBackground {
     opacity: .58;
   }
 }
 
-/* REDUCED MOTION */
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 360px) {
+
+  .header {
+    padding-left: 9px;
+    padding-right: 9px;
+    gap: 6px;
+  }
+
+  .header-avatar {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+  }
+
+  .header-tools {
+    gap: 5px;
+  }
+
+  .header-tool {
+    width: 34px;
+    height: 34px;
+  }
+
+  .header-user-info strong {
+    font-size: 12px;
+  }
+
+  .stats-grid {
+    gap: 5px;
+  }
+
+  .stat-card span {
+    font-size: 10px;
+  }
+
+  .nav-item {
+    min-width: 42px;
+  }
+}
+
+/* =========================================
+   TABLET & DESKTOP
+========================================= */
+
+@media (min-width: 768px) {
+
+  .header {
+    padding-left: max(5%, calc((100% - 1050px) / 2));
+    padding-right: max(5%, calc((100% - 1050px) / 2));
+  }
+
+  .container {
+    margin-top: 35px;
+  }
+
+  .profile-avatar {
+    width: 120px !important;
+    height: 120px !important;
+  }
+
+  .bottom-nav {
+    padding-left: 15%;
+    padding-right: 15%;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
