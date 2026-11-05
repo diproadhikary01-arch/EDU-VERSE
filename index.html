@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#071512">
-  <meta name="description" content="EDU VERSE - Your Personal HSC Learning World">
+  <meta name="description" content="EDU VERSE - HSC Learning Platform">
   <title>EDU VERSE | Premium Learning</title>
-  <link rel="stylesheet" href="./style.css?v=6">
+  <link rel="stylesheet" href="./style.css?v=7">
 </head>
 
 <body>
@@ -18,19 +18,34 @@
     <div class="aurora aurora-two"></div>
   </div>
 
+  <!-- MINIMAL HEADER -->
   <header class="header">
-    <div class="brand">
-      <div class="brand-icon">🎓</div>
-      <div>
-        <h1>EDU <span>VERSE</span></h1>
-        <small>Your Personal Learning World</small>
-      </div>
+    <button class="header-profile" onclick="showPage('profile')">
+      <img
+        id="headerProfileImage"
+        class="header-avatar"
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%23173529'/%3E%3Ctext x='50' y='65' font-size='48' text-anchor='middle' fill='%23e6bd65'%3E%E2%98%BA%3C/text%3E%3C/svg%3E"
+        alt="Profile"
+      >
+      <span class="header-user-info">
+        <strong id="headerUserName">Your Name</strong>
+        <small id="headerUserSubtitle">HSC Student</small>
+      </span>
+    </button>
+
+    <div class="header-tools">
+      <button class="header-tool" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        🌙
+      </button>
+      <button class="header-tool" id="languageToggle" onclick="toggleLanguage()" aria-label="Change language">
+        বাংলা
+      </button>
     </div>
-    <button class="profile-button" onclick="showPage('profile')">👤</button>
   </header>
 
   <main class="container">
 
+    <!-- HOME -->
     <section id="homePage" class="page active">
       <div class="hero">
         <span class="eyebrow">✦ YOUR LEARNING JOURNEY</span>
@@ -104,6 +119,7 @@
       <div id="subjectList" class="subject-list"></div>
     </section>
 
+    <!-- SUBJECTS -->
     <section id="subjectsPage" class="page">
       <div class="page-heading">
         <span class="eyebrow">YOUR STUDY LIBRARY</span>
@@ -113,6 +129,7 @@
       <div id="allSubjectList" class="subject-list"></div>
     </section>
 
+    <!-- CHAPTERS -->
     <section id="chapterPage" class="page">
       <button class="back-button" onclick="showPage('subjects')">
         ← Back to Subjects
@@ -127,6 +144,7 @@
       <div id="chapterList" class="chapter-list"></div>
     </section>
 
+    <!-- PRACTICE -->
     <section id="practicePage" class="page">
       <div class="page-heading">
         <span class="eyebrow">TEST YOUR KNOWLEDGE</span>
@@ -158,6 +176,7 @@
       </div>
     </section>
 
+    <!-- SAVED -->
     <section id="savedPage" class="page">
       <div class="page-heading">
         <span class="eyebrow">YOUR COLLECTION</span>
@@ -167,17 +186,141 @@
       <div id="savedList" class="chapter-list"></div>
     </section>
 
+    <!-- STUDENT PROFILE -->
     <section id="profilePage" class="page">
+
       <div class="page-heading">
-        <span class="eyebrow">YOUR LEARNING JOURNEY</span>
-        <h2>My Progress</h2>
-        <p>তোমার পড়াশোনার অগ্রগতি।</p>
+        <span class="eyebrow">PERSONAL STUDENT ACCOUNT</span>
+        <h2>My Profile</h2>
+        <p>তোমার ব্যক্তিগত ও শিক্ষাগত তথ্য সাজিয়ে রাখো।</p>
       </div>
 
       <div class="profile-card">
-        <div class="profile-avatar">🎓</div>
-        <h3>EDU VERSE Learner</h3>
-        <p>Keep learning. Keep growing.</p>
+
+        <div class="profile-photo-wrapper">
+          <img
+            id="profilePreview"
+            class="profile-avatar"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%23173529'/%3E%3Ctext x='50' y='65' font-size='48' text-anchor='middle' fill='%23e6bd65'%3E%E2%98%BA%3C/text%3E%3C/svg%3E"
+            alt="Student profile picture"
+          >
+
+          <label for="profileImageInput" class="photo-upload-button">
+            📷 Change Photo
+          </label>
+
+          <input
+            type="file"
+            id="profileImageInput"
+            accept="image/*"
+            hidden
+          >
+        </div>
+
+        <h3 id="profileDisplayName">Your Name</h3>
+        <p id="profileDisplayBatch">HSC Student</p>
+
+      </div>
+
+      <!-- PROFILE FORM -->
+      <form id="studentProfileForm" class="profile-form">
+
+        <div class="section-heading">
+          <h2>Personal Information</h2>
+        </div>
+
+        <label for="studentName">Full Name</label>
+        <input
+          id="studentName"
+          name="studentName"
+          type="text"
+          placeholder="তোমার সম্পূর্ণ নাম"
+          maxlength="60"
+        >
+
+        <label for="studentUsername">Username</label>
+        <input
+          id="studentUsername"
+          name="studentUsername"
+          type="text"
+          placeholder="তোমার Username"
+          maxlength="30"
+        >
+
+        <label for="studentAbout">About Me</label>
+        <textarea
+          id="studentAbout"
+          name="studentAbout"
+          rows="3"
+          placeholder="নিজের সম্পর্কে কিছু লিখো..."
+          maxlength="300"
+        ></textarea>
+
+        <div class="section-heading">
+          <h2>Education Information</h2>
+        </div>
+
+        <label for="studentBatch">HSC Batch</label>
+        <input
+          id="studentBatch"
+          name="studentBatch"
+          type="number"
+          placeholder="যেমন: 2027"
+          min="2000"
+          max="2100"
+        >
+
+        <label for="studentCollege">College Name</label>
+        <input
+          id="studentCollege"
+          name="studentCollege"
+          type="text"
+          placeholder="তোমার কলেজের নাম"
+          maxlength="100"
+        >
+
+        <label for="studentBoard">Education Board</label>
+        <select id="studentBoard" name="studentBoard">
+          <option value="">বোর্ড নির্বাচন করো</option>
+          <option value="Dhaka">Dhaka</option>
+          <option value="Cumilla">Cumilla</option>
+          <option value="Chattogram">Chattogram</option>
+          <option value="Rajshahi">Rajshahi</option>
+          <option value="Jashore">Jashore</option>
+          <option value="Barishal">Barishal</option>
+          <option value="Sylhet">Sylhet</option>
+          <option value="Dinajpur">Dinajpur</option>
+          <option value="Mymensingh">Mymensingh</option>
+          <option value="Madrasah">Madrasah</option>
+          <option value="Technical">Technical</option>
+        </select>
+
+        <label for="studentGroup">Academic Group</label>
+        <select id="studentGroup" name="studentGroup">
+          <option value="">গ্রুপ নির্বাচন করো</option>
+          <option value="Humanities">Humanities</option>
+          <option value="Science">Science</option>
+          <option value="Business Studies">Business Studies</option>
+        </select>
+
+        <label for="studentSession">HSC Session</label>
+        <input
+          id="studentSession"
+          name="studentSession"
+          type="text"
+          placeholder="যেমন: 2025-2026"
+          maxlength="20"
+        >
+
+        <button type="submit" class="primary-button profile-save-button">
+          💾 Save Profile
+        </button>
+
+      </form>
+
+      <!-- LEARNING PROGRESS -->
+      <div class="section-heading">
+        <h2>My Learning Progress</h2>
       </div>
 
       <div class="stats-grid">
@@ -196,20 +339,24 @@
       </div>
 
       <button class="secondary-button" onclick="resetProgress()">
-        Reset Progress
+        Reset Learning Progress
       </button>
+
     </section>
 
+    <!-- CHAPTER DETAILS -->
     <section id="chapterDetailsPage" class="page">
       <div id="chapterDetails"></div>
     </section>
 
+    <!-- QUIZ -->
     <section id="quizPage" class="page">
       <div id="quizContent"></div>
     </section>
 
   </main>
 
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <button class="nav-item active" data-page="home" onclick="showPage('home',this)">
       ⌂<small>Home</small>
@@ -228,9 +375,9 @@
     </button>
   </nav>
 
-  <script src="./chapters/bangla-1st.js?v=6"></script>
-  <script src="./background.js?v=6"></script>
-  <script src="./script.js?v=6"></script>
+  <script src="./chapters/bangla-1st.js?v=7"></script>
+  <script src="./background.js?v=7"></script>
+  <script src="./script.js?v=7"></script>
 
 </body>
 </html>
