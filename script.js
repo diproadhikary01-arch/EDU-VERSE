@@ -1,4 +1,3 @@
-
 "use strict";
 
 /* =========================================
@@ -21,39 +20,44 @@
   const DEFAULT_AVATAR =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%23173529'/%3E%3Ctext x='50' y='65' font-size='48' text-anchor='middle' fill='%23e6bd65'%3E%E2%98%BA%3C/text%3E%3C/svg%3E";
 
-  const subjects = [
-    "বাংলা ১ম পত্র",
-    "বাংলা ২য় পত্র",
-    "ইংরেজি ১ম পত্র",
-    "ইংরেজি ২য় পত্র",
-    "তথ্য ও যোগাযোগ প্রযুক্তি",
-    "পৌরনীতি ১ম পত্র",
-    "পৌরনীতি ২য় পত্র",
-    "অর্থনীতি ১ম পত্র",
-    "অর্থনীতি ২য় পত্র",
-    "ইতিহাস ১ম পত্র",
-    "ইতিহাস ২য় পত্র",
-    "ইসলামের ইতিহাস ১ম পত্র",
-    "ইসলামের ইতিহাস ২য় পত্র",
-    "সমাজবিজ্ঞান ১ম পত্র",
-    "সমাজবিজ্ঞান ২য় পত্র",
-    "যুক্তিবিদ্যা ১ম পত্র",
-    "যুক্তিবিদ্যা ২য় পত্র",
-    "ভূগোল ১ম পত্র",
-    "ভূগোল ২য় পত্র"
-  ];
+  const ENGLISH_SUBJECTS = {
+    "বাংলা ১ম পত্র": "Bangla 1st Paper",
+    "বাংলা ২য় পত্র": "Bangla 2nd Paper",
+    "ইংরেজি ১ম পত্র": "English 1st Paper",
+    "ইংরেজি ২য় পত্র": "English 2nd Paper",
+    "তথ্য ও যোগাযোগ প্রযুক্তি": "Information and Communication Technology",
+    "পৌরনীতি ১ম পত্র": "Civics 1st Paper",
+    "পৌরনীতি ২য় পত্র": "Civics 2nd Paper",
+    "অর্থনীতি ১ম পত্র": "Economics 1st Paper",
+    "অর্থনীতি ২য় পত্র": "Economics 2nd Paper",
+    "ইতিহাস ১ম পত্র": "History 1st Paper",
+    "ইতিহাস ২য় পত্র": "History 2nd Paper",
+    "ইসলামের ইতিহাস ১ম পত্র": "Islamic History 1st Paper",
+    "ইসলামের ইতিহাস ২য় পত্র": "Islamic History 2nd Paper",
+    "সমাজবিজ্ঞান ১ম পত্র": "Sociology 1st Paper",
+    "সমাজবিজ্ঞান ২য় পত্র": "Sociology 2nd Paper",
+    "যুক্তিবিদ্যা ১ম পত্র": "Logic 1st Paper",
+    "যুক্তিবিদ্যা ২য় পত্র": "Logic 2nd Paper",
+    "ভূগোল ১ম পত্র": "Geography 1st Paper",
+    "ভূগোল ২য় পত্র": "Geography 2nd Paper"
+  };
 
+  const subjects = Object.keys(ENGLISH_SUBJECTS);
   const icons = ["📘", "📗", "📙", "📕"];
+
+  const PASS_PERCENT = 70;
+  const SECONDS_PER_QUESTION = 40;
 
   let currentChapter = null;
   let currentPractice = "mcq";
+  let practiceChapterKey = null;
   let questions = [];
   let questionIndex = 0;
   let score = 0;
   let answered = false;
   let timerInterval = null;
   let remainingTime = 60;
-  let quizFinished = false;
+  let quizFinished = true;
   let language = "bn";
 
   /* STORAGE */
@@ -103,17 +107,31 @@
     return window.EDU_VERSE_CHAPTERS || {};
   }
 
-  function getBanglaChapter() {
-    return getChapterDatabase()["অপরিচিতা"] || null;
-  }
-
   function getChapterKey(chapter) {
     return chapter?.id || chapter?.title || "unknown";
   }
 
-  function getQuestionBank() {
-    const chapter = getBanglaChapter();
-    return Array.isArray(chapter?.mcq) ? chapter.mcq : [];
+  /* All chapters whose "paper" matches a subject name */
+  function getChaptersForPaper(paperName) {
+    return Object.values(getChapterDatabase())
+      .filter(chapter => chapter && chapter.paper === paperName)
+      .sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+  }
+
+  /* Question bank: one chapter, or every chapter */
+  function getQuestionBank(chapterKey = null) {
+    const bank = [];
+
+    Object.values(getChapterDatabase()).forEach(chapter => {
+      if (!chapter || !Array.isArray(chapter.mcq)) return;
+
+      const key = getChapterKey(chapter);
+      if (chapterKey && key !== chapterKey) return;
+
+      chapter.mcq.forEach(item => bank.push({ ...item, _chapterKey: key }));
+    });
+
+    return bank;
   }
 
   /* LANGUAGE DICTIONARY */
@@ -122,18 +140,19 @@
     "WELCOME TO": "স্বাগতম",
     "Quick Access": "দ্রুত প্রবেশ",
     "EXPLORE": "ঘুরে দেখো",
-    "Subjects": "বিষয়সমূহ",
+    "Subjects": "বিষয়সমূহ",
     "Practice": "অনুশীলন",
     "MCQ Practice": "MCQ অনুশীলন",
     "Saved Notes": "সংরক্ষিত নোট",
-    "All Subjects": "সকল বিষয়",
-    "YOUR STUDY LIBRARY": "তোমার পড়াশোনার লাইব্রেরি",
+    "All Subjects": "সকল বিষয়",
+    "YOUR STUDY LIBRARY": "তোমার পড়াশোনার লাইব্রেরি",
     "YOUR LEARNING JOURNEY": "তোমার শিক্ষাযাত্রা",
-    "CHAPTER LIBRARY": "অধ্যায়ের লাইব্রেরি",
+    "CHAPTER LIBRARY": "অধ্যায়ের লাইব্রেরি",
     "Practice Zone": "অনুশীলন কেন্দ্র",
     "TEST YOUR KNOWLEDGE": "নিজের জ্ঞান যাচাই করো",
-    "Saved Chapters": "সংরক্ষিত অধ্যায়",
+    "Saved Chapters": "সংরক্ষিত অধ্যায়",
     "YOUR COLLECTION": "তোমার সংগ্রহ",
+    "Profile": "প্রোফাইল",
     "My Profile": "আমার প্রোফাইল",
     "PERSONAL STUDENT ACCOUNT": "শিক্ষার্থীর ব্যক্তিগত অ্যাকাউন্ট",
     "Personal Information": "ব্যক্তিগত তথ্য",
@@ -147,22 +166,22 @@
     "Academic Group": "বিভাগ",
     "HSC Session": "এইচএসসি সেশন",
     "Save Profile": "প্রোফাইল সংরক্ষণ",
-    "My Learning Progress": "আমার পড়াশোনার অগ্রগতি",
+    "My Learning Progress": "আমার পড়াশোনার অগ্রগতি",
     "Completed": "সম্পন্ন",
     "Quizzes": "কুইজ",
     "Saved": "সংরক্ষিত",
     "Home": "হোম",
-    "Start Learning": "পড়াশোনা শুরু",
-    "Timer Quiz": "সময়ভিত্তিক কুইজ",
+    "Start Learning": "পড়াশোনা শুরু",
+    "Timer Quiz": "সময়ভিত্তিক কুইজ",
     "Quick Quiz": "দ্রুত কুইজ",
-    "Back to Subjects": "বিষয়ে ফিরে যাও",
-    "Back to Chapters": "অধ্যায়ে ফিরে যাও",
-    "Chapters": "অধ্যায়সমূহ",
+    "Back to Subjects": "বিষয়ে ফিরে যাও",
+    "Back to Chapters": "অধ্যায়ে ফিরে যাও",
+    "Chapters": "অধ্যায়সমূহ",
     "Start Practice": "অনুশীলন শুরু",
     "Start Quiz": "কুইজ শুরু",
     "Start Quick Quiz": "দ্রুত কুইজ শুরু",
-    "Saved Chapter": "সংরক্ষিত অধ্যায়",
-    "Save Chapter": "অধ্যায় সংরক্ষণ",
+    "Saved Chapter": "সংরক্ষিত অধ্যায়",
+    "Save Chapter": "অধ্যায় সংরক্ষণ",
     "Mark Completed": "সম্পন্ন হিসেবে চিহ্নিত করো",
     "Practice MCQ": "MCQ অনুশীলন",
     "Exit Quiz": "কুইজ থেকে বের হও",
@@ -170,32 +189,20 @@
     "See Result": "ফলাফল দেখো",
     "Quiz Completed!": "কুইজ সম্পন্ন!",
     "Try Again": "আবার চেষ্টা করো",
-    "Reset Learning Progress": "পড়াশোনার অগ্রগতি রিসেট",
+    "Reset Learning Progress": "পড়াশোনার অগ্রগতি রিসেট",
     "Change Photo": "ছবি পরিবর্তন",
     "HSC Student": "এইচএসসি শিক্ষার্থী",
     "Your Name": "তোমার নাম",
     "Select your board": "বোর্ড নির্বাচন করো",
     "Select your group": "বিভাগ নির্বাচন করো",
-    "Bangla 1st Paper": "বাংলা ১ম পত্র",
-    "Bangla 2nd Paper": "বাংলা ২য় পত্র",
-    "English 1st Paper": "ইংরেজি ১ম পত্র",
-    "English 2nd Paper": "ইংরেজি ২য় পত্র",
-    "Information and Communication Technology": "তথ্য ও যোগাযোগ প্রযুক্তি",
-    "Civics 1st Paper": "পৌরনীতি ১ম পত্র",
-    "Civics 2nd Paper": "পৌরনীতি ২য় পত্র",
-    "Economics 1st Paper": "অর্থনীতি ১ম পত্র",
-    "Economics 2nd Paper": "অর্থনীতি ২য় পত্র",
-    "History 1st Paper": "ইতিহাস ১ম পত্র",
-    "History 2nd Paper": "ইতিহাস ২য় পত্র",
-    "Islamic History 1st Paper": "ইসলামের ইতিহাস ১ম পত্র",
-    "Islamic History 2nd Paper": "ইসলামের ইতিহাস ২য় পত্র",
-    "Sociology 1st Paper": "সমাজবিজ্ঞান ১ম পত্র",
-    "Sociology 2nd Paper": "সমাজবিজ্ঞান ২য় পত্র",
-    "Logic 1st Paper": "যুক্তিবিদ্যা ১ম পত্র",
-    "Logic 2nd Paper": "যুক্তিবিদ্যা ২য় পত্র",
-    "Geography 1st Paper": "ভূগোল ১ম পত্র",
-    "Geography 2nd Paper": "ভূগোল ২য় পত্র"
+    ...ENGLISH_SUBJECTS_REVERSED()
   };
+
+  function ENGLISH_SUBJECTS_REVERSED() {
+    return Object.fromEntries(
+      Object.entries(ENGLISH_SUBJECTS).map(([bn, en]) => [en, bn])
+    );
+  }
 
   const reverseTranslations = Object.fromEntries(
     Object.entries(translations).map(([english, bangla]) => [
@@ -233,6 +240,10 @@
     return value.replace(trimmed, translated);
   }
 
+  function subjectLabel(name) {
+    return language === "en" ? (ENGLISH_SUBJECTS[name] || name) : name;
+  }
+
   function translatePage() {
     document.documentElement.lang = language;
 
@@ -242,14 +253,15 @@
       button.textContent = language === "bn" ? "EN" : "BN";
       button.setAttribute(
         "aria-label",
-        language === "bn" ? "Switch to English" : "বাংলায় পরিবর্তন"
+        language === "bn" ? "Switch to English" : "বাংলায় পরিবর্তন"
       );
     }
 
-    /* Chapter study content stays in its original language. */
+    /* Chapter study content and quiz content stay in their original language. */
 
     const excludedSelectors = [
       "#chapterDetails",
+      "#quizContent",
       ".section-content",
       ".discussion-item",
       ".character-item",
@@ -335,23 +347,23 @@
     }
   }
 
-  function tr(value) {
-    if (language === "bn") {
-      return reverseTranslations[value] || value;
-    }
-
-    return translations[value] || value;
-  }
-
   function toggleLanguage() {
     language = language === "bn" ? "en" : "bn";
 
     writeStorage(STORAGE.language, language);
-    translatePage();
 
     /* Refresh dynamic interface sections. */
     renderSubjects();
     renderSaved();
+
+    const paperTitle = document.getElementById("paperTitle");
+    if (paperTitle && paperTitle.dataset.paper) {
+      paperTitle.textContent = subjectLabel(paperTitle.dataset.paper);
+    }
+
+    if (document.getElementById("chapterPage")?.classList.contains("active") && paperTitle?.dataset.paper) {
+      renderChapterList(paperTitle.dataset.paper);
+    }
 
     if (currentChapter && document.getElementById("chapterDetailsPage")?.classList.contains("active")) {
       openChapterDetails(currentChapter.title);
@@ -375,7 +387,18 @@
     });
   }
 
+  function stopRunningQuiz() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    quizFinished = true;
+  }
+
   function showPage(pageName) {
+    /* Leaving an unfinished quiz stops its timer. */
+    if (pageName !== "quiz" && !quizFinished) {
+      stopRunningQuiz();
+    }
+
     document.querySelectorAll(".container > .page")
       .forEach(page => page.classList.remove("active"));
 
@@ -403,37 +426,12 @@
   /* SUBJECTS */
 
   function createSubjectCard(subject, index) {
-    const englishSubjects = {
-      "বাংলা ১ম পত্র": "Bangla 1st Paper",
-      "বাংলা ২য় পত্র": "Bangla 2nd Paper",
-      "ইংরেজি ১ম পত্র": "English 1st Paper",
-      "ইংরেজি ২য় পত্র": "English 2nd Paper",
-      "তথ্য ও যোগাযোগ প্রযুক্তি": "Information and Communication Technology",
-      "পৌরনীতি ১ম পত্র": "Civics 1st Paper",
-      "পৌরনীতি ২য় পত্র": "Civics 2nd Paper",
-      "অর্থনীতি ১ম পত্র": "Economics 1st Paper",
-      "অর্থনীতি ২য় পত্র": "Economics 2nd Paper",
-      "ইতিহাস ১ম পত্র": "History 1st Paper",
-      "ইতিহাস ২য় পত্র": "History 2nd Paper",
-      "ইসলামের ইতিহাস ১ম পত্র": "Islamic History 1st Paper",
-      "ইসলামের ইতিহাস ২য় পত্র": "Islamic History 2nd Paper",
-      "সমাজবিজ্ঞান ১ম পত্র": "Sociology 1st Paper",
-      "সমাজবিজ্ঞান ২য় পত্র": "Sociology 2nd Paper",
-      "যুক্তিবিদ্যা ১ম পত্র": "Logic 1st Paper",
-      "যুক্তিবিদ্যা ২য় পত্র": "Logic 2nd Paper",
-      "ভূগোল ১ম পত্র": "Geography 1st Paper",
-      "ভূগোল ২য় পত্র": "Geography 2nd Paper"
-    };
-
-    const label = language === "en"
-      ? (englishSubjects[subject] || subject)
-      : subject;
-
     return `
       <button class="subject-card"
-        onclick="openPaper('${escapeHTML(subject)}')">
+        data-paper="${escapeHTML(subject)}"
+        onclick="openPaper(this.dataset.paper)">
         <span class="subject-icon">${icons[index % icons.length]}</span>
-        <span>${escapeHTML(label)}</span>
+        <span>${escapeHTML(subjectLabel(subject))}</span>
         <span class="subject-arrow">→</span>
       </button>
     `;
@@ -448,88 +446,64 @@
       .join("");
   }
 
-  function openPaper(name) {
-    currentChapter = null;
+  function chapterButton(chapter, index) {
+    const number = String(chapter.chapterNumber || index + 1).padStart(2, "0");
 
-    const title = document.getElementById("paperTitle");
+    return `
+      <button class="chapter-item"
+        data-chapter="${escapeHTML(chapter.title)}"
+        onclick="openChapterDetails(this.dataset.chapter)">
+        <span class="chapter-number">${number}</span>
+        <span class="chapter-info">
+          <h3>${escapeHTML(chapter.title)}</h3>
+          <p>${escapeHTML(chapter.author || "")} · ${escapeHTML(chapter.type || "")}</p>
+          <span class="content-status">✓ ${language === "bn" ? "সম্পূর্ণ স্টাডি প্যাক" : "Complete Study Pack"}</span>
+        </span>
+        <span class="subject-arrow">→</span>
+      </button>
+    `;
+  }
+
+  function renderChapterList(name) {
     const list = document.getElementById("chapterList");
+    if (!list) return;
 
-    const englishSubjects = {
-      "বাংলা ১ম পত্র": "Bangla 1st Paper",
-      "বাংলা ২য় পত্র": "Bangla 2nd Paper",
-      "ইংরেজি ১ম পত্র": "English 1st Paper",
-      "ইংরেজি ২য় পত্র": "English 2nd Paper",
-      "তথ্য ও যোগাযোগ প্রযুক্তি": "Information and Communication Technology",
-      "পৌরনীতি ১ম পত্র": "Civics 1st Paper",
-      "পৌরনীতি ২য় পত্র": "Civics 2nd Paper",
-      "অর্থনীতি ১ম পত্র": "Economics 1st Paper",
-      "অর্থনীতি ২য় পত্র": "Economics 2nd Paper",
-      "ইতিহাস ১ম পত্র": "History 1st Paper",
-      "ইতিহাস ২য় পত্র": "History 2nd Paper",
-      "ইসলামের ইতিহাস ১ম পত্র": "Islamic History 1st Paper",
-      "ইসলামের ইতিহাস ২য় পত্র": "Islamic History 2nd Paper",
-      "সমাজবিজ্ঞান ১ম পত্র": "Sociology 1st Paper",
-      "সমাজবিজ্ঞান ২য় পত্র": "Sociology 2nd Paper",
-      "যুক্তিবিদ্যা ১ম পত্র": "Logic 1st Paper",
-      "যুক্তিবিদ্যা ২য় পত্র": "Logic 2nd Paper",
-      "ভূগোল ১ম পত্র": "Geography 1st Paper",
-      "ভূগোল ২য় পত্র": "Geography 2nd Paper"
-    };
+    const chapters = getChaptersForPaper(name);
 
-    if (title) {
-      title.textContent = language === "en"
-        ? englishSubjects[name] || name
-        : name;
-    }
+    if (chapters.length) {
+      list.innerHTML = `
+        ${chapters.map(chapterButton).join("")}
 
-    const isBanglaFirst =
-      name.includes("বাংলা") &&
-      (name.includes("১ম") || name.includes("প্রথম"));
-
-    if (isBanglaFirst) {
-      const chapter = getBanglaChapter();
-
-      if (chapter) {
-        list.innerHTML = `
-          <button class="chapter-item"
-            onclick="openChapterDetails('অপরিচিতা')">
-            <span class="chapter-number">01</span>
-            <span class="chapter-info">
-              <h3>${escapeHTML(chapter.title)}</h3>
-              <p>${escapeHTML(chapter.author)} · ${escapeHTML(chapter.type || "গদ্য")}</p>
-              <span class="content-status">✓ ${language === "bn" ? "সম্পূর্ণ স্টাডি প্যাক" : "Complete Study Pack"}</span>
-            </span>
-            <span class="subject-arrow">→</span>
-          </button>
-
-          <div class="coming-soon">
-            <h3>${language === "bn" ? "আরও অধ্যায় আসছে" : "More Chapters Coming Soon"}</h3>
-            <p>${language === "bn"
-              ? "বাংলা ১ম পত্রের পরবর্তী অধ্যায়গুলো পর্যায়ক্রমে যুক্ত করা হবে।"
-              : "More chapters of Bangla 1st Paper will be added gradually."}</p>
-          </div>
-        `;
-      } else {
-        list.innerHTML = `
-          <div class="empty-state">
-            <h3>${language === "bn" ? "অধ্যায়ের ডেটা পাওয়া যায়নি" : "Chapter Data Not Found"}</h3>
-            <p>${language === "bn"
-              ? "chapters/bangla-1st.js ফাইলটি সঠিকভাবে লোড হয়েছে কি না দেখো।"
-              : "Check whether chapters/bangla-1st.js loaded correctly."}</p>
-          </div>
-        `;
-      }
+        <div class="coming-soon">
+          <h3>${language === "bn" ? "আরও অধ্যায় আসছে" : "More Chapters Coming Soon"}</h3>
+          <p>${language === "bn"
+            ? "এই বিষয়ের পরবর্তী অধ্যায়গুলো পর্যায়ক্রমে যুক্ত করা হবে।"
+            : "More chapters of this subject will be added gradually."}</p>
+        </div>
+      `;
     } else {
       list.innerHTML = `
         <div class="coming-soon">
-          <h3>${language === "bn" ? "এই বিষয়ের অধ্যায় প্রস্তুত হচ্ছে" : "Chapters Are Being Prepared"}</h3>
+          <h3>${language === "bn" ? "এই বিষয়ের অধ্যায় প্রস্তুত হচ্ছে" : "Chapters Are Being Prepared"}</h3>
           <p>${language === "bn"
-            ? "এই বিষয়ের বিস্তারিত অধ্যায় ও অনুশীলন শীঘ্রই যুক্ত হবে।"
+            ? "এই বিষয়ের বিস্তারিত অধ্যায় ও অনুশীলন শীঘ্রই যুক্ত হবে।"
             : "Detailed chapters and practice for this subject will be added soon."}</p>
         </div>
       `;
     }
+  }
 
+  function openPaper(name) {
+    currentChapter = null;
+
+    const title = document.getElementById("paperTitle");
+
+    if (title) {
+      title.dataset.paper = name;
+      title.textContent = subjectLabel(name);
+    }
+
+    renderChapterList(name);
     showPage("chapter");
   }
 
@@ -633,7 +607,9 @@
     const chapter = getChapterDatabase()[title];
 
     if (!chapter) {
-      alert("এই অধ্যায়ের তথ্য পাওয়া যায়নি।");
+      alert(language === "bn"
+        ? "এই অধ্যায়ের তথ্য পাওয়া যায়নি।"
+        : "Chapter data not found.");
       return;
     }
 
@@ -653,19 +629,19 @@
 
     details.innerHTML = `
       <button class="back-button" onclick="showPage('chapter')">
-        ← ${language === "bn" ? "অধ্যায়ে ফিরে যাও" : "Back to Chapters"}
+        ← ${language === "bn" ? "অধ্যায়ে ফিরে যাও" : "Back to Chapters"}
       </button>
 
       <div class="chapter-hero">
-        <span class="eyebrow">${escapeHTML(chapter.paper || "বাংলা ১ম পত্র")}</span>
+        <span class="eyebrow">${escapeHTML(chapter.paper || "")}</span>
         <h2>${escapeHTML(chapter.title)}</h2>
-        <p>${escapeHTML(chapter.author || "")} · ${escapeHTML(chapter.type || "অধ্যায়")}</p>
+        <p>${escapeHTML(chapter.author || "")} · ${escapeHTML(chapter.type || "অধ্যায়")}</p>
 
         <div class="chapter-actions">
           <button class="secondary-button" onclick="toggleSaveCurrent()">
             ${saved
               ? (language === "bn" ? "🔖 সংরক্ষিত" : "🔖 Saved")
-              : (language === "bn" ? "＋ অধ্যায় সংরক্ষণ" : "＋ Save Chapter")}
+              : (language === "bn" ? "＋ অধ্যায় সংরক্ষণ" : "＋ Save Chapter")}
           </button>
           <button class="secondary-button" onclick="toggleCompletedCurrent()">
             ${completed
@@ -681,7 +657,7 @@
       ${textBlock("পাঠ পরিচিতি", chapter.introduction || chapter.intro)}
       ${textBlock("লেখক পরিচিতি", chapter.authorInfo)}
       ${textBlock("মূলভাব ও সারসংক্ষেপ", chapter.summary)}
-      ${textBlock("মূলভাব / বিষয়বস্তু", chapter.theme)}
+      ${textBlock("মূলভাব / বিষয়বস্তু", chapter.theme)}
 
       ${
         chapter.characters?.length
@@ -725,7 +701,7 @@
         chapter.mcq?.length
           ? `<section class="study-section">
               <h3>MCQ প্রশ্নব্যাংক (${chapter.mcq.length}টি)</h3>
-              <p class="section-content">সব প্রশ্নের অনুশীলনের জন্য MCQ Practice শুরু করো।</p>
+              <p class="section-content">সব প্রশ্নের অনুশীলনের জন্য MCQ Practice শুরু করো। ${PASS_PERCENT}% বা তার বেশি পেলে অধ্যায়টি নিজে থেকে "সম্পন্ন" হয়ে যাবে।</p>
               <button class="primary-button" onclick="startChapterPractice()">
                 ${language === "bn"
                   ? `${chapter.mcq.length}টি MCQ শুরু করো`
@@ -827,9 +803,9 @@
     if (!chapters.length) {
       list.innerHTML = `
         <div class="empty-state">
-          <h3>${language === "bn" ? "এখনো কিছু সংরক্ষণ করা হয়নি" : "Nothing Saved Yet"}</h3>
+          <h3>${language === "bn" ? "এখনো কিছু সংরক্ষণ করা হয়নি" : "Nothing Saved Yet"}</h3>
           <p>${language === "bn"
-            ? "অধ্যায় থেকে Save Chapter চাপলে এখানে পাবে।"
+            ? "অধ্যায় থেকে Save Chapter চাপলে এখানে পাবে।"
             : "Save a chapter to see it here."}</p>
         </div>
       `;
@@ -838,12 +814,13 @@
 
     list.innerHTML = chapters.map(chapter => `
       <button class="chapter-item"
-        onclick="openChapterDetails('${escapeHTML(chapter.title)}')">
+        data-chapter="${escapeHTML(chapter.title)}"
+        onclick="openChapterDetails(this.dataset.chapter)">
         <span class="chapter-number">📘</span>
         <span class="chapter-info">
           <h3>${escapeHTML(chapter.title)}</h3>
           <p>${escapeHTML(chapter.author || "")}</p>
-          <span class="content-status">${language === "bn" ? "সংরক্ষিত অধ্যায়" : "Saved Chapter"}</span>
+          <span class="content-status">${language === "bn" ? "সংরক্ষিত অধ্যায়" : "Saved Chapter"}</span>
         </span>
         <span class="subject-arrow">→</span>
       </button>
@@ -874,11 +851,6 @@
       const element = document.getElementById(id);
       if (element) element.value = profile[key] || "";
     });
-
-    const photo = profile.photo || DEFAULT_AVATAR;
-
-    const preview = document.getElementById("profilePreview");
-    if (preview) preview.src = photo;
 
     updateHeaderProfile(profile);
   }
@@ -929,13 +901,15 @@
     profile.session = document.getElementById("studentSession").value.trim();
 
     if (!writeStorage(STORAGE.profile, profile)) {
-      alert("Profile Save করা যায়নি। Browser storage পূর্ণ হতে পারে।");
+      alert(language === "bn"
+        ? "Profile Save করা যায়নি। Browser storage পূর্ণ হতে পারে।"
+        : "Could not save the profile. Browser storage may be full.");
       return;
     }
 
     updateHeaderProfile(profile);
     alert(language === "bn"
-      ? "তোমার Profile সফলভাবে Save হয়েছে! ❤️"
+      ? "তোমার Profile সফলভাবে Save হয়েছে! ❤️"
       : "Your profile has been saved successfully! ❤️");
   }
 
@@ -987,20 +961,20 @@
 
           if (!writeStorage(STORAGE.profile, profile)) {
             alert(language === "bn"
-              ? "ছবিটি Save করা যায়নি। ছোট সাইজের ছবি চেষ্টা করো।"
+              ? "ছবিটি Save করা যায়নি। ছোট সাইজের ছবি চেষ্টা করো।"
               : "Could not save the image. Try a smaller image.");
             return;
           }
 
           updateHeaderProfile(profile);
           alert(language === "bn"
-            ? "Profile Picture Update হয়েছে! ❤️"
+            ? "Profile Picture Update হয়েছে! ❤️"
             : "Profile picture updated! ❤️");
         };
 
         image.onerror = () => alert(
           language === "bn"
-            ? "ছবিটি খোলা যায়নি। অন্য ছবি চেষ্টা করো।"
+            ? "ছবিটি খোলা যায়নি। অন্য ছবি চেষ্টা করো।"
             : "Could not open the image. Try another one."
         );
 
@@ -1066,16 +1040,20 @@
       options: Array.isArray(question.options) ? question.options : [],
       answer: Number(question.answer),
       explanation: question.explanation ||
-        "এই প্রশ্নের অতিরিক্ত ব্যাখ্যা দেওয়া হয়নি।"
+        "এই প্রশ্নের অতিরিক্ত ব্যাখ্যা দেওয়া হয়নি।",
+      chapterKey: question._chapterKey || null
     };
   }
 
-  function startPractice(mode = "mcq") {
-    const bank = getQuestionBank();
+  function startPractice(mode = "mcq", chapterKey = null) {
+    /* Practice started from Home / Practice page uses every chapter. */
+    practiceChapterKey = chapterKey;
+
+    const bank = getQuestionBank(chapterKey);
 
     if (!bank.length) {
       alert(language === "bn"
-        ? "এখনো কোনো অধ্যায়ের MCQ পাওয়া যায়নি।"
+        ? "এখনো কোনো অধ্যায়ের MCQ পাওয়া যায়নি।"
         : "No chapter MCQs are available yet.");
       return;
     }
@@ -1092,17 +1070,22 @@
       questions = shuffled.slice(0, 5);
     } else if (mode === "timer") {
       questions = shuffled.slice(0, 15);
-      remainingTime = 60;
     } else {
       questions = shuffled;
     }
 
     if (!questions.length) {
-      alert(language === "bn" ? "প্রশ্ন পাওয়া যায়নি।" : "No questions found.");
+      alert(language === "bn" ? "প্রশ্ন পাওয়া যায়নি।" : "No questions found.");
+      quizFinished = true;
       return;
     }
 
+    /* 40 seconds per question */
+    remainingTime = questions.length * SECONDS_PER_QUESTION;
+
     clearInterval(timerInterval);
+    timerInterval = null;
+
     showPage("quiz");
     renderQuestion();
 
@@ -1110,7 +1093,10 @@
   }
 
   function startChapterPractice() {
-    startPractice("mcq");
+    startPractice(
+      "mcq",
+      currentChapter ? getChapterKey(currentChapter) : null
+    );
   }
 
   /* TIMER */
@@ -1121,6 +1107,7 @@
     timerInterval = setInterval(() => {
       if (quizFinished) {
         clearInterval(timerInterval);
+        timerInterval = null;
         return;
       }
 
@@ -1135,8 +1122,9 @@
     const timer = document.getElementById("timerDisplay");
     if (!timer) return;
 
-    const minutes = Math.floor(remainingTime / 60);
-    const seconds = remainingTime % 60;
+    const safeTime = Math.max(remainingTime, 0);
+    const minutes = Math.floor(safeTime / 60);
+    const seconds = safeTime % 60;
 
     timer.textContent =
       `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
@@ -1162,7 +1150,7 @@
           <span>${currentPractice.toUpperCase()} ${language === "bn" ? "মোড" : "MODE"}</span>
           ${
             currentPractice === "timer"
-              ? `<span class="timer-display" id="timerDisplay">01:00</span>`
+              ? `<span class="timer-display" id="timerDisplay">00:00</span>`
               : `<span>${language === "bn" ? "স্কোর" : "Score"}: ${score}</span>`
           }
         </div>
@@ -1256,11 +1244,30 @@
     }
   }
 
+  /* Mark the chapter completed when the quiz was for one chapter and score is high enough. */
+  function autoCompleteChapter(percentage) {
+    if (percentage < PASS_PERCENT) return false;
+    if (questions.length < 5) return false;
+
+    const keys = [...new Set(questions.map(q => q.chapterKey).filter(Boolean))];
+
+    if (keys.length !== 1) return false;
+
+    const key = keys[0];
+    const completed = getCompleted();
+
+    if (completed.includes(key)) return false;
+
+    writeStorage(STORAGE.completed, [...completed, key]);
+    return true;
+  }
+
   function finishQuiz(timeUp = false) {
     if (quizFinished) return;
 
     quizFinished = true;
     clearInterval(timerInterval);
+    timerInterval = null;
 
     writeStorage(STORAGE.quiz, getQuizCount() + 1);
 
@@ -1272,11 +1279,13 @@
     const content = document.getElementById("quizContent");
     const percentage = Math.round((score / questions.length) * 100);
 
+    const justCompleted = autoCompleteChapter(percentage);
+
     content.innerHTML = `
       <div class="result-card">
-        <div class="result-icon">${percentage >= 70 ? "🏆" : "📚"}</div>
+        <div class="result-icon">${percentage >= PASS_PERCENT ? "🏆" : "📚"}</div>
         <h2>${timeUp
-          ? (language === "bn" ? "সময় শেষ!" : "Time's Up!")
+          ? (language === "bn" ? "সময় শেষ!" : "Time's Up!")
           : (language === "bn" ? "কুইজ সম্পন্ন!" : "Quiz Completed!")}</h2>
         <div class="result-score">${score}/${questions.length}</div>
         <h3>${percentage}% ${language === "bn" ? "সঠিক" : "Correct"}</h3>
@@ -1291,12 +1300,21 @@
                     ? "ভালো চেষ্টা! আরও অনুশীলন করো।"
                     : "Good effort! Keep practising.")
                 : (language === "bn"
-                    ? "হাল ছেড়ো না। অধ্যায়টি আবার পড়ো এবং চেষ্টা করো।"
+                    ? "হাল ছেড়ো না। অধ্যায়টি আবার পড়ো এবং চেষ্টা করো।"
                     : "Don't give up. Review the chapter and try again.")
           }
         </p>
 
-        <button class="primary-button" onclick="startPractice('${currentPractice}')">
+        ${
+          justCompleted
+            ? `<p>✓ ${language === "bn"
+                ? "অধ্যায়টি সম্পন্ন হিসেবে চিহ্নিত হয়েছে!"
+                : "Chapter marked as completed!"}</p>`
+            : ""
+        }
+
+        <button class="primary-button"
+          onclick="startPractice('${currentPractice}', ${practiceChapterKey ? "'" + String(practiceChapterKey).replace(/'/g, "\\'") + "'" : "null"})">
           ${language === "bn" ? "আবার চেষ্টা করো" : "Try Again"} →
         </button>
 
@@ -1314,20 +1332,22 @@
   }
 
   function closeQuiz() {
-    clearInterval(timerInterval);
-    quizFinished = true;
+    stopRunningQuiz();
     showPage("practice");
   }
 
   /* PROGRESS */
 
   function updateProgress() {
+    const completedCount = getCompleted().length;
+    const quizCount = getQuizCount();
+
     const values = {
-      completedCount: getCompleted().length,
-      completedCountHome: getCompleted().length,
+      completedCount: completedCount,
+      completedCountHome: completedCount,
       savedCount: getSaved().length,
-      quizCount: getQuizCount(),
-      quizCountHome: getQuizCount()
+      quizCount: quizCount,
+      quizCountHome: quizCount
     };
 
     Object.entries(values).forEach(([id, value]) => {
@@ -1352,7 +1372,7 @@
     updateProgress();
 
     alert(language === "bn"
-      ? "Learning Progress Reset হয়েছে।"
+      ? "Learning Progress Reset হয়েছে।"
       : "Learning progress has been reset.");
   }
 
@@ -1405,6 +1425,8 @@
   /* INITIALIZATION */
 
   function init() {
+    language = readStorage(STORAGE.language, "bn");
+
     renderSubjects();
     loadProfile();
     updateProgress();
@@ -1412,9 +1434,6 @@
 
     const savedTheme = readStorage(STORAGE.theme, "dark");
     applyTheme(savedTheme);
-
-    language = readStorage(STORAGE.language, "bn");
-    translatePage();
 
     const profileForm = document.getElementById("studentProfileForm");
 
@@ -1425,8 +1444,8 @@
     setupProfileImage();
     setupSwipe();
 
-    if (!getBanglaChapter()) {
-      console.error("অপরিচিতা অধ্যায়ের ডেটা পাওয়া যায়নি।");
+    if (!Object.keys(getChapterDatabase()).length) {
+      console.error("কোনো অধ্যায়ের ডেটা পাওয়া যায়নি।");
     }
 
     translatePage();
