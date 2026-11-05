@@ -1411,3 +1411,44 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.addEventListener("input", filterSubjects);
   }
 });
+
+/* =====================================
+   EDU VERSE — PAGE SWIPE ANIMATION
+===================================== */
+
+.page-slide-next {
+  animation: pageSlideNext 0.35s ease both;
+}
+
+.page-slide-prev {
+  animation: pageSlidePrev 0.35s ease both;
+}
+
+@keyframes pageSlideNext {
+  from {
+    opacity: 0;
+    transform: translateX(35px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pageSlidePrev {
+  from {
+    opacity: 0;
+    transform: translateX(-35px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-slide-next,
+  .page-slide-prev {
+    animation: none !important;
+  }
+}
