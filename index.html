@@ -6,17 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#071512">
   <meta name="description" content="EDU VERSE - Your Personal HSC Learning World">
+
   <title>EDU VERSE | Premium Learning</title>
-  <link rel="stylesheet" href="./style.css">
+
+  <!-- PREMIUM CSS -->
+  <link rel="stylesheet" href="/EDU-VERSE/style.css?v=20261105-2">
 </head>
 
 <body>
 
+  <!-- AURORA BACKGROUND -->
   <div class="aurora-background">
     <div class="aurora aurora-one"></div>
     <div class="aurora aurora-two"></div>
   </div>
 
+  <!-- HEADER -->
   <header class="header">
     <div class="brand">
       <div class="brand-icon">E</div>
@@ -25,6 +30,7 @@
         <small>Your Personal Learning World</small>
       </div>
     </div>
+
     <button class="profile-button" onclick="showPage('profile')">👤</button>
   </header>
 
@@ -32,17 +38,37 @@
 
     <!-- HOME -->
     <section id="homePage" class="page active">
+
       <div class="hero">
         <span class="eyebrow">✦ PREMIUM LEARNING EXPERIENCE</span>
+
         <h2>Welcome to <span>EDU VERSE</span></h2>
-        <p>তোমার HSC প্রস্তুতির সম্পূর্ণ শিক্ষাজগৎ। পড়ো, অনুশীলন করো এবং নিজের সাফল্যের পথে এগিয়ে যাও।</p>
-        <button class="primary-button" onclick="showPage('subjects')">Start Learning →</button>
+
+        <p>
+          তোমার HSC প্রস্তুতির সম্পূর্ণ শিক্ষাজগৎ।
+          পড়ো, অনুশীলন করো এবং নিজের সাফল্যের পথে এগিয়ে যাও।
+        </p>
+
+        <button class="primary-button" onclick="showPage('subjects')">
+          Start Learning →
+        </button>
       </div>
 
       <div class="stats-grid">
-        <div class="stat-card"><strong>14+</strong><span>Subjects</span></div>
-        <div class="stat-card"><strong id="completedCountHome">0</strong><span>Completed</span></div>
-        <div class="stat-card"><strong id="quizCountHome">0</strong><span>Quizzes</span></div>
+        <div class="stat-card">
+          <strong>14+</strong>
+          <span>Subjects</span>
+        </div>
+
+        <div class="stat-card">
+          <strong id="completedCountHome">0</strong>
+          <span>Completed</span>
+        </div>
+
+        <div class="stat-card">
+          <strong id="quizCountHome">0</strong>
+          <span>Quizzes</span>
+        </div>
       </div>
 
       <div class="section-heading">
@@ -51,42 +77,79 @@
       </div>
 
       <div class="quick-grid">
-        <button class="quick-card" onclick="showPage('subjects')">📚<b>Subjects</b><small>বিষয় নির্বাচন</small></button>
-        <button class="quick-card" onclick="startPractice('quick')">⚡<b>Quick Quiz</b><small>দ্রুত পরীক্ষা</small></button>
-        <button class="quick-card" onclick="startPractice('mcq')">🎯<b>MCQ Practice</b><small>প্রশ্ন অনুশীলন</small></button>
-        <button class="quick-card" onclick="showPage('saved')">🔖<b>Saved Notes</b><small>সংরক্ষিত অধ্যায়</small></button>
+        <button class="quick-card" onclick="showPage('subjects')">
+          📚
+          <b>Subjects</b>
+          <small>বিষয় নির্বাচন</small>
+        </button>
+
+        <button class="quick-card" onclick="startPractice('quick')">
+          ⚡
+          <b>Quick Quiz</b>
+          <small>দ্রুত পরীক্ষা</small>
+        </button>
+
+        <button class="quick-card" onclick="startPractice('mcq')">
+          🎯
+          <b>MCQ Practice</b>
+          <small>প্রশ্ন অনুশীলন</small>
+        </button>
+
+        <button class="quick-card" onclick="showPage('saved')">
+          🔖
+          <b>Saved Notes</b>
+          <small>সংরক্ষিত অধ্যায়</small>
+        </button>
       </div>
 
       <div class="section-heading">
         <h2>Find Your Subject</h2>
       </div>
-      <input id="searchInput" class="search-input" type="search" placeholder="বিষয় খুঁজুন...">
+
+      <input
+        id="searchInput"
+        class="search-input"
+        type="search"
+        placeholder="বিষয় খুঁজুন..."
+      >
+
       <div id="subjectList" class="subject-list"></div>
+
     </section>
 
     <!-- SUBJECTS -->
     <section id="subjectsPage" class="page">
+
       <div class="page-heading">
         <span class="eyebrow">YOUR STUDY LIBRARY</span>
         <h2>All Subjects</h2>
         <p>তোমার পছন্দের বিষয় নির্বাচন করো।</p>
       </div>
+
       <div id="allSubjectList" class="subject-list"></div>
+
     </section>
 
-    <!-- CHAPTER LIST -->
+    <!-- CHAPTERS -->
     <section id="chapterPage" class="page">
-      <button class="back-button" onclick="showPage('subjects')">← Back to Subjects</button>
+
+      <button class="back-button" onclick="showPage('subjects')">
+        ← Back to Subjects
+      </button>
+
       <div class="page-heading">
         <span class="eyebrow">CHAPTER LIBRARY</span>
         <h2 id="paperTitle">Chapters</h2>
         <p>অধ্যায় নির্বাচন করে বিস্তারিত পড়া শুরু করো।</p>
       </div>
+
       <div id="chapterList" class="chapter-list"></div>
+
     </section>
 
     <!-- PRACTICE -->
     <section id="practicePage" class="page">
+
       <div class="page-heading">
         <span class="eyebrow">TEST YOUR KNOWLEDGE</span>
         <h2>Practice Zone</h2>
@@ -94,36 +157,47 @@
       </div>
 
       <div class="practice-grid">
+
         <button class="practice-card" onclick="startPractice('mcq')">
-          <span>🎯</span><h3>MCQ Practice</h3>
+          <span>🎯</span>
+          <h3>MCQ Practice</h3>
           <p>অধ্যায়ের প্রশ্নব্যাংক থেকে অনুশীলন।</p>
           <b>Start Practice →</b>
         </button>
+
         <button class="practice-card" onclick="startPractice('timer')">
-          <span>⏱️</span><h3>Timer Quiz</h3>
+          <span>⏱️</span>
+          <h3>Timer Quiz</h3>
           <p>সময় ধরে নিজের দক্ষতা যাচাই করো।</p>
           <b>Start Quiz →</b>
         </button>
+
         <button class="practice-card" onclick="startPractice('quick')">
-          <span>⚡</span><h3>Quick Quiz</h3>
+          <span>⚡</span>
+          <h3>Quick Quiz</h3>
           <p>৫টি প্রশ্নে দ্রুত পরীক্ষা।</p>
           <b>Start Quick Quiz →</b>
         </button>
+
       </div>
     </section>
 
     <!-- SAVED -->
     <section id="savedPage" class="page">
+
       <div class="page-heading">
         <span class="eyebrow">YOUR COLLECTION</span>
         <h2>Saved Chapters</h2>
         <p>তোমার সংরক্ষিত অধ্যায়গুলো এখানে থাকবে।</p>
       </div>
+
       <div id="savedList" class="chapter-list"></div>
+
     </section>
 
     <!-- PROFILE -->
     <section id="profilePage" class="page">
+
       <div class="page-heading">
         <span class="eyebrow">YOUR LEARNING JOURNEY</span>
         <h2>My Progress</h2>
@@ -137,12 +211,26 @@
       </div>
 
       <div class="stats-grid">
-        <div class="stat-card"><strong id="completedCount">0</strong><span>Completed</span></div>
-        <div class="stat-card"><strong id="quizCount">0</strong><span>Quizzes</span></div>
-        <div class="stat-card"><strong id="savedCount">0</strong><span>Saved</span></div>
+        <div class="stat-card">
+          <strong id="completedCount">0</strong>
+          <span>Completed</span>
+        </div>
+
+        <div class="stat-card">
+          <strong id="quizCount">0</strong>
+          <span>Quizzes</span>
+        </div>
+
+        <div class="stat-card">
+          <strong id="savedCount">0</strong>
+          <span>Saved</span>
+        </div>
       </div>
 
-      <button class="secondary-button" onclick="resetProgress()">Reset Progress</button>
+      <button class="secondary-button" onclick="resetProgress()">
+        Reset Progress
+      </button>
+
     </section>
 
     <!-- CHAPTER DETAILS -->
@@ -157,17 +245,41 @@
 
   </main>
 
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
-    <button class="nav-item active" data-page="home" onclick="showPage('home',this)">⌂<small>Home</small></button>
-    <button class="nav-item" data-page="subjects" onclick="showPage('subjects',this)">▦<small>Subjects</small></button>
-    <button class="nav-item" data-page="practice" onclick="showPage('practice',this)">✦<small>Practice</small></button>
-    <button class="nav-item" data-page="saved" onclick="showPage('saved',this)">♡<small>Saved</small></button>
-    <button class="nav-item" data-page="profile" onclick="showPage('profile',this)">◎<small>Profile</small></button>
+
+    <button class="nav-item active" data-page="home" onclick="showPage('home',this)">
+      ⌂
+      <small>Home</small>
+    </button>
+
+    <button class="nav-item" data-page="subjects" onclick="showPage('subjects',this)">
+      ▦
+      <small>Subjects</small>
+    </button>
+
+    <button class="nav-item" data-page="practice" onclick="showPage('practice',this)">
+      ✦
+      <small>Practice</small>
+    </button>
+
+    <button class="nav-item" data-page="saved" onclick="showPage('saved',this)">
+      ♡
+      <small>Saved</small>
+    </button>
+
+    <button class="nav-item" data-page="profile" onclick="showPage('profile',this)">
+      ◎
+      <small>Profile</small>
+    </button>
+
   </nav>
 
-  <!-- Chapter data must load before the main script -->
-  <script src="./chapters/bangla-1st.js"></script>
-  <script src="./script.js"></script>
+  <!-- CHAPTER DATABASE FIRST -->
+  <script src="/EDU-VERSE/chapters/bangla-1st.js?v=20261105-2"></script>
+
+  <!-- MAIN JAVASCRIPT SECOND -->
+  <script src="/EDU-VERSE/script.js?v=20261105-2"></script>
 
 </body>
 </html>
