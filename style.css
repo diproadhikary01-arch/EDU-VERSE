@@ -3,6 +3,11 @@
    EDU VERSE — PREMIUM EMERALD GOLD UI
    Responsive • Dark/Light Mode
    Animated Network • Glassmorphism
+   Header Fixed • EN/BN Ready
+========================================= */
+
+/* =========================================
+   GLOBAL
 ========================================= */
 
 * {
@@ -29,6 +34,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -51,6 +57,10 @@ textarea {
 button {
   cursor: pointer;
   color: inherit;
+}
+
+img {
+  max-width: 100%;
 }
 
 /* =========================================
@@ -124,73 +134,105 @@ button {
   z-index: 2;
 }
 
+/* =========================================
+   HEADER — FIXED
+========================================= */
+
 .header {
   position: sticky;
   top: 0;
   z-index: 20;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  min-height: 72px;
+
+  gap: 10px;
+  width: 100%;
+  min-height: 70px;
   padding: 10px 16px;
-  background: rgba(7, 21, 18, .90);
+
+  background: rgba(7, 21, 18, .92);
   border-bottom: 1px solid var(--border);
+
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
 
-/* Header Profile */
+/* Profile Button */
 
 .header-profile {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: 1;
+
+  flex: 1 1 auto;
   min-width: 0;
   width: auto;
+
   padding: 0;
   border: none;
+  outline: none;
   background: transparent;
+
   text-align: left;
   overflow: hidden;
 }
 
+/* Header Profile Image */
+
 .header-avatar {
   display: block;
-  width: 46px !important;
-  height: 46px !important;
-  min-width: 46px !important;
-  max-width: 46px !important;
-  min-height: 46px !important;
-  max-height: 46px !important;
+
+  width: 42px !important;
+  height: 42px !important;
+
+  min-width: 42px !important;
+  max-width: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+
   object-fit: cover;
   object-position: center;
+
   border-radius: 50%;
-  flex-shrink: 0;
   border: 2px solid var(--border);
+
+  flex: 0 0 42px;
 }
+
+/* Header Name */
 
 .header-user-info {
   display: flex;
   flex-direction: column;
   gap: 3px;
+
+  flex: 1 1 auto;
   min-width: 0;
+  max-width: 170px;
+
   overflow: hidden;
 }
 
 .header-user-info strong {
+  display: block;
   color: var(--text);
+
   font-size: 14px;
   font-weight: 750;
+
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .header-user-info small {
+  display: block;
   color: var(--muted);
+
   font-size: 11px;
+
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -202,22 +244,60 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
-  flex-shrink: 0;
+
+  gap: 7px;
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
+/* Header Buttons */
+
 .header-tool {
-  width: 40px;
-  height: 40px;
   display: grid;
   place-items: center;
-  padding: 0;
+
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+
+  padding: 0 8px;
+
   border: 1px solid var(--border);
   border-radius: 12px;
+
   background: var(--card);
   color: var(--text);
-  font-size: 17px;
+
+  font-size: 15px;
+  font-weight: 750;
+  white-space: nowrap;
+
+  flex-shrink: 0;
   transition: .2s ease;
+}
+
+/* Language Button */
+
+#languageToggle {
+  width: auto;
+  min-width: 44px;
+  height: 40px;
+  padding: 0 10px;
+
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .3px;
+}
+
+/* Theme Button */
+
+#themeToggle {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+
+  font-size: 17px;
 }
 
 .header-tool:hover {
@@ -239,8 +319,10 @@ button {
   display: grid;
   place-items: center;
   border-radius: 14px;
+
   color: #071512;
   background: linear-gradient(135deg, var(--gold2), var(--gold));
+
   font-size: 25px;
   font-weight: 900;
 }
@@ -268,13 +350,17 @@ button {
   background: var(--card);
 }
 
+/* Main Container */
+
 .container {
   width: min(1050px, 92%);
   margin: 30px auto;
+  min-width: 0;
 }
 
 .page {
   display: none;
+  min-width: 0;
   animation: pageEnter .35s ease;
 }
 
@@ -287,6 +373,7 @@ button {
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -300,26 +387,34 @@ button {
 .hero {
   position: relative;
   overflow: hidden;
+
   padding: clamp(25px, 6vw, 55px);
+
   border: 1px solid var(--border);
   border-radius: 28px;
+
   background: linear-gradient(
     130deg,
     rgba(21, 54, 40, .92),
     rgba(11, 30, 23, .82)
   );
+
   box-shadow: var(--shadow);
+
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
 .hero::after {
   content: "✦";
+
   position: absolute;
   right: 8%;
   bottom: 10%;
+
   color: rgba(230, 189, 101, .12);
   font-size: 110px;
+
   animation: heroFloat 6s ease-in-out infinite alternate;
   pointer-events: none;
 }
@@ -328,6 +423,7 @@ button {
   from {
     transform: translateY(0) rotate(0deg);
   }
+
   to {
     transform: translateY(-18px) rotate(15deg);
   }
@@ -335,6 +431,7 @@ button {
 
 .eyebrow {
   display: inline-block;
+
   color: var(--gold);
   font-size: 11px;
   font-weight: 800;
@@ -364,8 +461,10 @@ button {
 
 .primary-button {
   margin-top: 22px;
+
   border: none;
   color: #071512;
+
   background: linear-gradient(135deg, var(--gold2), var(--gold));
 }
 
@@ -393,17 +492,21 @@ button {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin: 22px 0 35px;
 }
 
 .stat-card {
+  min-width: 0;
   padding: 20px 10px;
   text-align: center;
+
   border: 1px solid var(--border);
   border-radius: var(--radius);
+
   background: var(--card);
+
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -464,11 +567,16 @@ button {
 .practice-card,
 .subject-card,
 .chapter-item {
+  min-width: 0;
+
   text-align: left;
+
   border: 1px solid var(--border);
   background: var(--card);
   border-radius: var(--radius);
+
   transition: .2s ease;
+
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -477,6 +585,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 8px;
+
   padding: 20px;
   font-size: 24px;
 }
@@ -499,17 +608,21 @@ button {
 }
 
 /* =========================================
-   SEARCH
+   SEARCH & FORM INPUTS
 ========================================= */
 
 .search-input {
+  display: block;
   width: 100%;
   margin: 10px 0 18px;
   padding: 15px;
+
   color: var(--text);
   background: var(--card);
+
   border: 1px solid var(--border);
   border-radius: 13px;
+
   outline: none;
 }
 
@@ -528,9 +641,16 @@ select,
 textarea {
   color: var(--text);
   background: var(--card);
+
   border: 1px solid var(--border);
   border-radius: 12px;
+
   padding: 12px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
 }
 
 select option {
@@ -552,8 +672,10 @@ select option {
   display: flex;
   align-items: center;
   gap: 14px;
+
   width: 100%;
   padding: 16px;
+
   font-weight: 650;
 }
 
@@ -574,6 +696,7 @@ select option {
   display: flex;
   align-items: center;
   gap: 15px;
+
   width: 100%;
   padding: 17px;
 }
@@ -582,11 +705,15 @@ select option {
   width: 43px;
   height: 43px;
   min-width: 43px;
+
   display: grid;
   place-items: center;
+
   border-radius: 13px;
+
   color: var(--gold);
   background: rgba(230, 189, 101, .12);
+
   font-weight: 900;
 }
 
@@ -616,8 +743,10 @@ select option {
 .empty-state {
   padding: 30px;
   text-align: center;
+
   border: 1px dashed var(--border);
   border-radius: var(--radius);
+
   background: rgba(16, 39, 30, .45);
 }
 
@@ -665,26 +794,37 @@ select option {
 .profile-card {
   padding: 30px;
   margin-bottom: 20px;
+
   text-align: center;
+
   border: 1px solid var(--border);
   border-radius: var(--radius);
+
   background: var(--card);
 }
 
-/* Profile image: fixed size */
+/* Profile Image */
 
-.profile-avatar {
+.profile-avatar,
+#profilePreview {
   display: block;
-  width: 110px !important;
-  height: 110px !important;
-  min-width: 110px;
-  max-width: 110px;
-  min-height: 110px;
-  max-height: 110px;
-  margin: 0 auto;
+
+  width: 112px !important;
+  height: 112px !important;
+
+  min-width: 112px;
+  max-width: 112px;
+  min-height: 112px;
+  max-height: 112px;
+
+  margin: 0 auto 12px;
+
   object-fit: cover;
   object-position: center;
+
   border-radius: 50%;
+  border: 3px solid var(--gold);
+
   font-size: 0;
 }
 
@@ -723,9 +863,15 @@ select option {
 .chapter-hero {
   padding: 25px;
   margin-bottom: 22px;
+
   border: 1px solid var(--border);
   border-radius: 22px;
-  background: linear-gradient(135deg, rgba(27, 68, 47, .9), var(--card));
+
+  background: linear-gradient(
+    135deg,
+    rgba(27, 68, 47, .9),
+    var(--card)
+  );
 }
 
 .chapter-hero h2 {
@@ -748,9 +894,12 @@ select option {
 .study-section {
   padding: 23px;
   margin: 18px 0;
+
   border: 1px solid var(--border);
   border-radius: var(--radius);
+
   background: var(--card);
+
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -793,8 +942,10 @@ select option {
   display: grid;
   grid-template-columns: minmax(100px, .7fr) 2fr;
   gap: 12px;
+
   padding: 13px;
   border-radius: 10px;
+
   background: rgba(255, 255, 255, .035);
 }
 
@@ -810,8 +961,10 @@ select option {
 .cq-card {
   padding: 18px;
   margin-top: 14px;
+
   border: 1px solid var(--border);
   border-radius: 14px;
+
   background: rgba(255, 255, 255, .025);
 }
 
@@ -823,6 +976,7 @@ select option {
 .stimulus {
   padding: 14px;
   margin-bottom: 12px;
+
   border-left: 3px solid var(--gold);
   background: rgba(230, 189, 101, .06);
 }
@@ -839,6 +993,7 @@ select option {
 .revision-item {
   margin-top: 14px;
   padding: 13px;
+
   border-radius: 10px;
   background: rgba(230, 189, 101, .06);
 }
@@ -867,8 +1022,10 @@ select option {
 
 .quiz-card {
   padding: clamp(18px, 4vw, 30px);
+
   border: 1px solid var(--border);
   border-radius: 22px;
+
   background: var(--card);
 }
 
@@ -876,6 +1033,7 @@ select option {
   display: flex;
   justify-content: space-between;
   gap: 10px;
+
   color: var(--gold);
   font-size: 12px;
   font-weight: 800;
@@ -890,6 +1048,7 @@ select option {
   height: 7px;
   margin: 18px 0;
   overflow: hidden;
+
   border-radius: 20px;
   background: #263b30;
 }
@@ -897,7 +1056,9 @@ select option {
 .quiz-progress div {
   height: 100%;
   border-radius: 20px;
+
   background: linear-gradient(90deg, var(--green), var(--gold));
+
   transition: width .3s ease;
 }
 
@@ -922,22 +1083,30 @@ select option {
   display: flex;
   align-items: center;
   gap: 12px;
+
   width: 100%;
   padding: 15px;
+
   text-align: left;
   color: var(--text);
+
   background: rgba(255, 255, 255, .035);
+
   border: 1px solid var(--border);
   border-radius: 12px;
+
   line-height: 1.7;
 }
 
 .quiz-option span {
   min-width: 28px;
   height: 28px;
+
   display: grid;
   place-items: center;
+
   border-radius: 8px;
+
   color: var(--gold);
   background: rgba(230, 189, 101, .12);
 }
@@ -959,6 +1128,7 @@ select option {
 .answer-feedback {
   padding: 16px;
   margin-top: 18px;
+
   border-radius: 12px;
   line-height: 1.8;
 }
@@ -986,8 +1156,10 @@ select option {
 .result-card {
   padding: 35px 20px;
   text-align: center;
+
   border: 1px solid var(--border);
   border-radius: 22px;
+
   background: var(--card);
 }
 
@@ -1024,15 +1196,21 @@ select option {
 .bottom-nav {
   position: fixed;
   z-index: 30;
+
   right: 0;
   bottom: 0;
   left: 0;
+
   display: flex;
   justify-content: space-around;
   align-items: center;
+
   padding: 10px 5px calc(10px + env(safe-area-inset-bottom));
+
   border-top: 1px solid var(--border);
+
   background: rgba(7, 21, 18, .96);
+
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
@@ -1043,12 +1221,16 @@ select option {
   align-items: center;
   justify-content: center;
   gap: 4px;
+
   min-width: 52px;
   padding: 5px;
+
   border: none;
   background: transparent;
+
   color: var(--muted);
   font-size: 21px;
+
   transition: .2s ease;
 }
 
@@ -1065,29 +1247,27 @@ select option {
 }
 
 /* =========================================
-   DARK / LIGHT MODE
+   LIGHT MODE
 ========================================= */
-
-/* Light Theme Variables */
 
 body.light-mode {
   --bg: #f2f6f2;
   --bg2: #e6eee8;
+
   --card: rgba(255, 255, 255, .94);
   --card2: #edf3ee;
+
   --gold: #9a6a16;
   --gold2: #a87920;
+
   --green: #168b5b;
   --text: #183126;
   --muted: #64776c;
   --danger: #dc4545;
+
   --border: rgba(100, 125, 105, .25);
   --shadow: 0 12px 35px rgba(25, 55, 35, .09);
-}
 
-/* Light Body */
-
-body.light-mode {
   background: var(--bg);
   color: var(--text);
 }
@@ -1107,7 +1287,7 @@ body.light-mode #networkBackground {
 /* Light Header */
 
 body.light-mode .header {
-  background: rgba(247, 250, 247, .94);
+  background: rgba(247, 250, 247, .96);
 }
 
 body.light-mode .bottom-nav {
@@ -1224,18 +1404,34 @@ textarea:focus-visible {
     padding-bottom: 95px;
   }
 
+  /* Header */
+
   .header {
     min-height: 65px;
-    padding: 9px 13px;
+    padding: 9px 12px;
+    gap: 7px;
+  }
+
+  .header-profile {
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 9px;
   }
 
   .header-avatar {
-    width: 42px !important;
-    height: 42px !important;
-    min-width: 42px !important;
-    max-width: 42px !important;
-    min-height: 42px !important;
-    max-height: 42px !important;
+    width: 40px !important;
+    height: 40px !important;
+
+    min-width: 40px !important;
+    max-width: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+
+    flex-basis: 40px;
+  }
+
+  .header-user-info {
+    max-width: 125px;
   }
 
   .header-user-info strong {
@@ -1246,11 +1442,33 @@ textarea:focus-visible {
     font-size: 10px;
   }
 
-  .header-tool {
-    width: 37px;
-    height: 37px;
-    font-size: 15px;
+  .header-tools {
+    gap: 6px;
+    flex: 0 0 auto;
   }
+
+  .header-tool {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  #themeToggle {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+  }
+
+  #languageToggle {
+    width: auto;
+    min-width: 40px;
+    height: 36px;
+    padding: 0 9px;
+    font-size: 12px;
+  }
+
+  /* Main */
 
   .container {
     width: 92%;
@@ -1265,6 +1483,8 @@ textarea:focus-visible {
     font-size: clamp(28px, 8vw, 38px);
   }
 
+  /* Stats */
+
   .stats-grid {
     gap: 8px;
   }
@@ -1277,6 +1497,8 @@ textarea:focus-visible {
     font-size: 23px;
   }
 
+  /* Cards */
+
   .quick-grid,
   .practice-grid {
     gap: 10px;
@@ -1286,6 +1508,8 @@ textarea:focus-visible {
   .practice-card {
     padding: 16px;
   }
+
+  /* Chapters */
 
   .chapter-actions {
     flex-direction: column;
@@ -1308,22 +1532,30 @@ textarea:focus-visible {
     font-size: 27px;
   }
 
+  /* Quiz */
+
   .question-title {
     font-size: 17px;
   }
+
+  /* Profile */
 
   .profile-card {
     padding: 22px 16px;
   }
 
-  .profile-avatar {
+  .profile-avatar,
+  #profilePreview {
     width: 100px !important;
     height: 100px !important;
+
     min-width: 100px;
     max-width: 100px;
     min-height: 100px;
     max-height: 100px;
   }
+
+  /* Bottom Navigation */
 
   .bottom-nav {
     padding-top: 9px;
@@ -1350,29 +1582,58 @@ textarea:focus-visible {
 @media (max-width: 360px) {
 
   .header {
-    padding-left: 9px;
-    padding-right: 9px;
-    gap: 6px;
-  }
-
-  .header-avatar {
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    max-width: 38px !important;
-  }
-
-  .header-tools {
+    padding-left: 8px;
+    padding-right: 8px;
     gap: 5px;
   }
 
-  .header-tool {
-    width: 34px;
-    height: 34px;
+  .header-profile {
+    gap: 7px;
+  }
+
+  .header-avatar {
+    width: 36px !important;
+    height: 36px !important;
+
+    min-width: 36px !important;
+    max-width: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+
+    flex-basis: 36px;
+  }
+
+  .header-user-info {
+    max-width: 95px;
   }
 
   .header-user-info strong {
     font-size: 12px;
+  }
+
+  .header-tools {
+    gap: 4px;
+  }
+
+  .header-tool {
+    width: 33px;
+    min-width: 33px;
+    height: 34px;
+    padding: 0;
+  }
+
+  #themeToggle {
+    width: 33px;
+    min-width: 33px;
+    height: 34px;
+  }
+
+  #languageToggle {
+    width: auto;
+    min-width: 36px;
+    height: 34px;
+    padding: 0 7px;
+    font-size: 11px;
   }
 
   .stats-grid {
@@ -1403,7 +1664,8 @@ textarea:focus-visible {
     margin-top: 35px;
   }
 
-  .profile-avatar {
+  .profile-avatar,
+  #profilePreview {
     width: 120px !important;
     height: 120px !important;
   }
