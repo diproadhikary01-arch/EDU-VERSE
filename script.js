@@ -221,7 +221,8 @@
     "তোমার কলেজের নাম": "Your college name",
     "বোর্ড নির্বাচন করো": "Select your board",
     "গ্রুপ নির্বাচন করো": "Select your group",
-    "যেমন: 2025-2026": "Example: 2025-2026"
+    "যেমন: 2025-2026": "Example: 2025-2026",
+    "বিষয় খুঁজো...": "Search subjects..."
   };
 
   function translateValue(value) {
@@ -425,25 +426,114 @@
 
   /* SUBJECTS */
 
-  function createSubjectCard(subject, index) {
+  const SUBJECT_ICONS = [
+    ["ইসলামের ইতিহাস", "🕌"],
+    ["বাংলা", "📖"],
+    ["ইংরেজি", "🔤"],
+    ["তথ্য ও যোগাযোগ", "💻"],
+    ["পৌরনীতি", "⚖️"],
+    ["অর্থনীতি", "📈"],
+    ["ইতিহাস", "🏛️"],
+    ["সমাজবিজ্ঞান", "👥"],
+    ["যুক্তিবিদ্যা", "🧩"],
+    ["ভূগোল", "🌍"]
+  ];
+
+  function subjectIcon(base) {
+    const match = SUBJECT_ICONS.find(([word]) => base.startsWith(word));
+    return match ? match[1] : "📘";
+  }
+
+  /* Groups "বাংলা ১ম পত্র" + "বাংলা ২য় পত্র" under one card. */
+  function groupSubjects() {
+    const groups = [];
+
+    subjects.forEach(full => {
+      const match = full.match(/^(.*?)\s*([১২]ম পত্র)$/);
+      const base = match ? match[1] : full;
+      const paper = match ? match[2] : null;
+
+      let group = groups.find(item => item.base === base);
+
+      if (!group) {
+        group = { base, items: [] };
+        groups.push(group);
+      }
+
+      group.items.push({ full, paper });
+    });
+
+    return groups;
+  }
+
+  function englishBase(base, items) {
+    const english = ENGLISH_SUBJECTS[items[0].full] || base;
+    return english.replace(/\s*(1st|2nd) Paper$/, "");
+  }
+
+  function createSubjectGroup(group) {
+    const enBase = englishBase(group.base, group.items);
+    const title = language === "en" ? enBase : group.base;
+    const search = `${group.base} ${enBase}`.toLowerCase();
+
+    const buttons = group.items.map(({ full, paper }) => {
+      const count = getChaptersForPaper(full).length;
+
+      const paperLabel = paper
+        ? (language === "en" ? (paper.startsWith("১") ? "1st Paper" : "2nd Paper") : paper)
+        : (language === "en" ? "Open" : "খুলুন");
+
+      const status = count
+        ? (language === "en" ? `${count} chapter${count > 1 ? "s" : ""}` : `${count}টি অধ্যায়`)
+        : (language === "en" ? "Soon" : "শীঘ্রই");
+
+      return `
+        <button class="paper-btn ${count ? "ready" : ""}"
+          data-paper="${escapeHTML(full)}"
+          onclick="openPaper(this.dataset.paper)">
+          <span class="paper-name">${escapeHTML(paperLabel)}</span>
+          <small class="paper-status">${escapeHTML(status)}</small>
+        </button>
+      `;
+    }).join("");
+
     return `
-      <button class="subject-card"
-        data-paper="${escapeHTML(subject)}"
-        onclick="openPaper(this.dataset.paper)">
-        <span class="subject-icon">${icons[index % icons.length]}</span>
-        <span>${escapeHTML(subjectLabel(subject))}</span>
-        <span class="subject-arrow">→</span>
-      </button>
+      <article class="subject-group" data-search="${escapeHTML(search)}">
+        <div class="subject-group-head">
+          <span class="subject-badge">${subjectIcon(group.base)}</span>
+          <h3>${escapeHTML(title)}</h3>
+        </div>
+        <div class="paper-row">${buttons}</div>
+      </article>
     `;
+  }
+
+  function filterSubjects() {
+    const input = document.getElementById("subjectSearch");
+    const query = (input?.value || "").trim().toLowerCase();
+    let visible = 0;
+
+    document.querySelectorAll("#allSubjectList .subject-group").forEach(card => {
+      const show = !query || card.dataset.search.includes(query);
+      card.style.display = show ? "" : "none";
+      if (show) visible++;
+    });
+
+    const empty = document.getElementById("subjectEmpty");
+    if (empty) empty.style.display = visible ? "none" : "block";
   }
 
   function renderSubjects() {
     const allList = document.getElementById("allSubjectList");
     if (!allList) return;
 
-    allList.innerHTML = subjects
-      .map(createSubjectCard)
-      .join("");
+    allList.innerHTML = groupSubjects().map(createSubjectGroup).join("") + `
+      <div id="subjectEmpty" class="empty-state" style="display:none">
+        <h3>${language === "bn" ? "কোনো বিষয় পাওয়া যায়নি" : "No subject found"}</h3>
+      </div>
+    `;
+
+    filterSubjects();
   }
 
   function chapterButton(chapter, index) {
@@ -1550,6 +1640,9 @@
     if (profileForm) {
       profileForm.addEventListener("submit", saveProfile);
     }
+
+    document.getElementById("subjectSearch")
+      ?.addEventListener("input", filterSubjects);
 
     setupProfileImage();
     setupSwipe();
