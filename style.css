@@ -503,3 +503,35 @@ body.light-mode .paper-btn.ready {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================
+   SOLID HEADER + BOTTOM NAV (no see-through mixing)
+========================================= */
+
+.header {
+  background: #071512;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+}
+
+.bottom-nav {
+  background: #071512;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, .35);
+}
+
+body.light-mode .header,
+body.light-mode .bottom-nav {
+  background: #f7faf7;
+  box-shadow: 0 0 18px rgba(25, 55, 35, .12);
+}
+
+.jump-bar {
+  top: 70px;
+}
+
+body {
+  padding-bottom: 110px;
+}
